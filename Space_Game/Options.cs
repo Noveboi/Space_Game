@@ -59,11 +59,15 @@ namespace Space_Game
         }
         #endregion
 
+        //Have an instance of userSettings to pass to setSettings() when Check is fired and
+        //to modify when loadSettings() is called
         UserSettings userSettings;
 
         public Options()
         {
             InitializeComponent();
+
+            //Prevent resizing
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
         }
