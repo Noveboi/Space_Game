@@ -118,6 +118,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="Scores.resx">
+      <DependentUpon>Scores.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="EarlyGameboy.ttf" />
     <None Include="packages.config" />
     <None Include="Properties\Early GameBoy.ttf" />

@@ -40,11 +40,12 @@
             // title
             // 
             this.title.BackColor = System.Drawing.Color.Transparent;
-            this.title.Font = new System.Drawing.Font("Algerian", 72F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.title.Font = new System.Drawing.Font("Niagara Engraved", 86F);
             this.title.ForeColor = System.Drawing.SystemColors.Control;
-            this.title.Location = new System.Drawing.Point(12, 9);
+            this.title.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.title.Location = new System.Drawing.Point(21, 9);
             this.title.Name = "title";
-            this.title.Size = new System.Drawing.Size(791, 132);
+            this.title.Size = new System.Drawing.Size(767, 132);
             this.title.TabIndex = 0;
             this.title.Text = "SPACE!";
             this.title.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -52,11 +53,11 @@
             // playText
             // 
             this.playText.BackColor = System.Drawing.Color.Transparent;
-            this.playText.Font = new System.Drawing.Font("Algerian", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.playText.Font = new System.Drawing.Font("Niagara Solid", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.playText.ForeColor = System.Drawing.SystemColors.Control;
-            this.playText.Location = new System.Drawing.Point(12, 141);
+            this.playText.Location = new System.Drawing.Point(288, 164);
             this.playText.Name = "playText";
-            this.playText.Size = new System.Drawing.Size(776, 87);
+            this.playText.Size = new System.Drawing.Size(220, 64);
             this.playText.TabIndex = 1;
             this.playText.Text = "PLAY";
             this.playText.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -67,11 +68,11 @@
             // optionsText
             // 
             this.optionsText.BackColor = System.Drawing.Color.Transparent;
-            this.optionsText.Font = new System.Drawing.Font("Algerian", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.optionsText.Font = new System.Drawing.Font("Niagara Solid", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.optionsText.ForeColor = System.Drawing.SystemColors.Control;
-            this.optionsText.Location = new System.Drawing.Point(12, 238);
+            this.optionsText.Location = new System.Drawing.Point(297, 243);
             this.optionsText.Name = "optionsText";
-            this.optionsText.Size = new System.Drawing.Size(776, 87);
+            this.optionsText.Size = new System.Drawing.Size(211, 64);
             this.optionsText.TabIndex = 2;
             this.optionsText.Text = "OPTIONS";
             this.optionsText.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -81,14 +82,15 @@
             // scoresText
             // 
             this.scoresText.BackColor = System.Drawing.Color.Transparent;
-            this.scoresText.Font = new System.Drawing.Font("Algerian", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.scoresText.Font = new System.Drawing.Font("Niagara Solid", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.scoresText.ForeColor = System.Drawing.SystemColors.Control;
-            this.scoresText.Location = new System.Drawing.Point(12, 335);
+            this.scoresText.Location = new System.Drawing.Point(297, 326);
             this.scoresText.Name = "scoresText";
-            this.scoresText.Size = new System.Drawing.Size(776, 87);
+            this.scoresText.Size = new System.Drawing.Size(211, 64);
             this.scoresText.TabIndex = 3;
             this.scoresText.Text = "SCORES";
             this.scoresText.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.scoresText.Click += new System.EventHandler(this.scoresText_Click);
             this.scoresText.MouseEnter += new System.EventHandler(this.changeCursor);
             // 
             // pictureBox1

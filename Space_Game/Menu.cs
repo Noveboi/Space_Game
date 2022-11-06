@@ -66,6 +66,13 @@ namespace Space_Game
         private void playText_FontChanged(object sender, EventArgs e)
         { 
         }
+
+        private void scoresText_Click(object sender, EventArgs e)
+        {
+            Scores scores = new Scores();
+            scores.Show();
+            scores.Size = new Size(this.Width / 2, 600);
+        }
     }
     public class FontSetter
     {
