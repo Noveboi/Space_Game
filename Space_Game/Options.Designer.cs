@@ -51,6 +51,8 @@
             // 
             this.checkBox1.BackColor = System.Drawing.Color.Transparent;
             this.checkBox1.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.checkBox1.Checked = true;
+            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox1.FlatAppearance.BorderSize = 0;
             this.checkBox1.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Transparent;
             this.checkBox1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -60,7 +62,7 @@
             this.checkBox1.Size = new System.Drawing.Size(100, 100);
             this.checkBox1.TabIndex = 2;
             this.checkBox1.UseVisualStyleBackColor = false;
-            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox_CheckedChanged);
             // 
             // label2
             // 
@@ -78,6 +80,8 @@
             // 
             this.checkBox2.BackColor = System.Drawing.Color.Transparent;
             this.checkBox2.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.checkBox2.Checked = true;
+            this.checkBox2.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox2.FlatAppearance.BorderSize = 0;
             this.checkBox2.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Transparent;
             this.checkBox2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -87,6 +91,7 @@
             this.checkBox2.Size = new System.Drawing.Size(100, 100);
             this.checkBox2.TabIndex = 4;
             this.checkBox2.UseVisualStyleBackColor = false;
+            this.checkBox2.CheckedChanged += new System.EventHandler(this.checkBox_CheckedChanged);
             // 
             // Options
             // 
