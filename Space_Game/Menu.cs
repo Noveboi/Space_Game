@@ -35,6 +35,8 @@ namespace Space_Game
          //close Menu when Game form is closed
             Game game = new Game();
             game.Show();
+            game.MaximizeBox = false;
+            game.MinimizeBox = false;
             if (game.Focused) { this.Hide(); }
             //close Menu when event FormClosed is fired from the Game form
             game.FormClosed += (s, args) => this.Close(); 

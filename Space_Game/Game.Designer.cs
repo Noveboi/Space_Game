@@ -28,12 +28,39 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Game));
+            this.p = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.p)).BeginInit();
+            this.SuspendLayout();
+            // 
+            // p
+            // 
+            this.p.Image = ((System.Drawing.Image)(resources.GetObject("p.Image")));
+            this.p.Location = new System.Drawing.Point(565, 502);
+            this.p.Name = "p";
+            this.p.Size = new System.Drawing.Size(150, 167);
+            this.p.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.p.TabIndex = 0;
+            this.p.TabStop = false;
+            // 
+            // Game
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.BackColor = System.Drawing.Color.DarkSlateBlue;
+            this.ClientSize = new System.Drawing.Size(1264, 681);
+            this.Controls.Add(this.p);
+            this.Name = "Game";
             this.Text = "Game";
+            this.Load += new System.EventHandler(this.Game_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Game_KeyDown);
+            ((System.ComponentModel.ISupportInitialize)(this.p)).EndInit();
+            this.ResumeLayout(false);
+
         }
 
         #endregion
+
+        private System.Windows.Forms.PictureBox p;
     }
 }
