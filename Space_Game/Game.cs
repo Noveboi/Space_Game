@@ -12,6 +12,9 @@ namespace Space_Game
 {
     public partial class Game : Form
     {
+        //game variables
+        private Timer gameTimer = new Timer { Interval = 1000 };
+        private int elapsedSeconds = 0;
         //player attributes
         private int playerSpeed;
         private Size playerSize;
@@ -33,6 +36,15 @@ namespace Space_Game
             InitializeComponent();
             movementTimer.Tick += MovementTimer_Tick;
             bulletTimer.Tick += BulletTimer_Tick;
+            gameTimer.Tick += GameTimer_Tick;
+        }
+
+        private void GameTimer_Tick(object sender, EventArgs e)
+        {
+            if (elapsedSeconds > 120) { gameTimer.Stop(); return; }
+            timeLabel.Text = TimeSpan.FromSeconds(elapsedSeconds).ToString(@"mm\:ss");
+            elapsedSeconds++;
+
         }
 
         private void BulletTimer_Tick(object sender, EventArgs e)
@@ -63,6 +75,8 @@ namespace Space_Game
             playerSpeed = 20;
             playerSize = p.Size;
             Focus();
+            timeLabel.Text = "";
+            gameTimer.Start();
         }
 
         /// <summary>

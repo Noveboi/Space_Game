@@ -31,6 +31,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Game));
             this.p = new System.Windows.Forms.PictureBox();
             this.log = new System.Windows.Forms.TextBox();
+            this.timeLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.p)).BeginInit();
             this.SuspendLayout();
             // 
@@ -59,12 +60,24 @@
             this.log.TabIndex = 0;
             this.log.TabStop = false;
             // 
+            // timeLabel
+            // 
+            this.timeLabel.AutoSize = true;
+            this.timeLabel.Font = new System.Drawing.Font("Niagara Solid", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.timeLabel.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.timeLabel.Location = new System.Drawing.Point(12, 621);
+            this.timeLabel.Name = "timeLabel";
+            this.timeLabel.Size = new System.Drawing.Size(85, 51);
+            this.timeLabel.TabIndex = 1;
+            this.timeLabel.Text = "timer";
+            // 
             // Game
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.DarkSlateBlue;
             this.ClientSize = new System.Drawing.Size(1264, 681);
+            this.Controls.Add(this.timeLabel);
             this.Controls.Add(this.log);
             this.Controls.Add(this.p);
             this.Name = "Game";
@@ -83,5 +96,6 @@
 
         private System.Windows.Forms.PictureBox p;
         private System.Windows.Forms.TextBox log;
+        private System.Windows.Forms.Label timeLabel;
     }
 }
