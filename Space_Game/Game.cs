@@ -12,12 +12,14 @@ namespace Space_Game
 {
     public partial class Game : Form
     {
+        #region Private Variables
         //game variables
         private Timer gameTimer = new Timer { Interval = 1000 };
         private int elapsedSeconds = 0;
+
         //player attributes
-        private int playerSpeed;
-        private Size playerSize;
+        private int vehicleSpeed;
+        private Size vehicleSize;
 
         //bullet variables
         private List<PictureBox> bullets = new List<PictureBox>();
@@ -30,7 +32,7 @@ namespace Space_Game
 
         //paths
         private string spritePath = "../../Sprites/";
-
+        #endregion
         public Game()
         {
             InitializeComponent();
@@ -39,6 +41,7 @@ namespace Space_Game
             gameTimer.Tick += GameTimer_Tick;
         }
 
+        #region Timers
         private void GameTimer_Tick(object sender, EventArgs e)
         {
             if (elapsedSeconds > 120) { gameTimer.Stop(); return; }
@@ -62,6 +65,15 @@ namespace Space_Game
                 }
 
                 //Despawn bullet if it hits enemy
+                bool xLeftBound = bullet.Location.X > enemy.Location.X;
+                bool xRightBound = bullet.Location.X < enemy.Location.X + enemy.Width + bullet.Width;
+                if ((xLeftBound && xRightBound) && bullet.Location.Y <= enemy.Location.Y + enemy.Height)
+                {
+                    Controls.Remove(bullet);
+                    bullets.Remove(bullet);
+                    log.AppendText("Enemy Hit!!!!");
+                    //ADD SCORE AND STUFF
+                }
             }
         }
 
@@ -69,14 +81,20 @@ namespace Space_Game
         {
             PlayerMove();
         }
+        #endregion
 
         private void Game_Load(object sender, EventArgs e)
         {
-            playerSpeed = 20;
-            playerSize = p.Size;
+            vehicleSpeed = 20;
+            vehicleSize = p.Size;
+
             Focus();
+
             timeLabel.Text = "";
             gameTimer.Start();
+            Controls.SetChildIndex(timeLabel, -1);
+
+            log.Hide();
         }
 
         /// <summary>
@@ -104,11 +122,17 @@ namespace Space_Game
                 case Keys.D:
                     mr = true;
                     break;
+                //Fire a bullet
                 case Keys.Space:
                     SpawnBullet(p.Location);
                     log.AppendText($"Bullet Fired at {p.Location}{Environment.NewLine}");
                     log.AppendText($"Total Bullets Alive: {bullets.Count}{Environment.NewLine}");
                     bulletTimer.Start();
+                    break;
+                //Show or hide debugging log
+                case Keys.P:
+                    if (log.Visible) log.Hide();
+                    else log.Show();
                     break;
             }
             PlayerMove();
@@ -159,22 +183,22 @@ namespace Space_Game
         void MoveUp()
         {
             if (p.Location.Y > Height / 2 - 100)
-            { p.Location = new Point(p.Location.X, p.Location.Y - (playerSpeed - yReduction)); }
+            { p.Location = new Point(p.Location.X, p.Location.Y - (vehicleSpeed - yReduction)); }
         }
         void MoveLeft()
         {
             if (p.Location.X > 10)
-            { p.Location = new Point(p.Location.X - playerSpeed, p.Location.Y); }
+            { p.Location = new Point(p.Location.X - vehicleSpeed, p.Location.Y); }
         }
         void MoveDown()
         {
-            if (p.Location.Y < Height - (playerSize.Height + playerSpeed + 20))
-            { p.Location = new Point(p.Location.X, p.Location.Y + (playerSpeed - yReduction)); }
+            if (p.Location.Y < Height - (vehicleSize.Height + vehicleSpeed + 20))
+            { p.Location = new Point(p.Location.X, p.Location.Y + (vehicleSpeed - yReduction)); }
         }
         void MoveRight()
         {
-            if (p.Location.X < Width - (playerSize.Width + playerSpeed + 10))
-            { p.Location = new Point(p.Location.X + playerSpeed, p.Location.Y); }
+            if (p.Location.X < Width - (vehicleSize.Width + vehicleSpeed + 10))
+            { p.Location = new Point(p.Location.X + vehicleSpeed, p.Location.Y); }
         }
         void PlayerMove()
         {
@@ -185,13 +209,14 @@ namespace Space_Game
         }
         #endregion
 
+        #region Bullet Mechanics
         void SpawnBullet(Point currentPlayerLoc)
         {
             PictureBox bullet = new PictureBox();
             bullet.Image = Image.FromFile($"{spritePath}bullet.png");
             bullet.SizeMode = PictureBoxSizeMode.StretchImage;
             bullet.Size = new Size(10, 60);
-            bullet.Location = new Point(currentPlayerLoc.X + playerSize.Width / 2 - 5, currentPlayerLoc.Y - playerSize.Height / 2 + 6);
+            bullet.Location = new Point(currentPlayerLoc.X + vehicleSize.Width / 2 - 5, currentPlayerLoc.Y - vehicleSize.Height / 2 + 6);
             Controls.Add(bullet);
             bullets.Add(bullet);
         }
@@ -200,5 +225,6 @@ namespace Space_Game
         {
             bullet.Location = new Point(bullet.Location.X, bullet.Location.Y - 14);
         }
+        #endregion
     }
 }
