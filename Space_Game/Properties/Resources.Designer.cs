@@ -59,15 +59,5 @@ namespace Space_Game.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] Early_GameBoy {
-            get {
-                object obj = ResourceManager.GetObject("Early_GameBoy", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
     }
 }

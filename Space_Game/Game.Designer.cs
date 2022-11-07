@@ -62,6 +62,7 @@
             // 
             // enemy
             // 
+            this.enemy.BackColor = System.Drawing.Color.Transparent;
             this.enemy.Image = ((System.Drawing.Image)(resources.GetObject("enemy.Image")));
             this.enemy.Location = new System.Drawing.Point(565, 12);
             this.enemy.Name = "enemy";
@@ -87,7 +88,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.DarkSlateBlue;
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(16)))), ((int)(((byte)(16)))), ((int)(((byte)(30)))));
             this.ClientSize = new System.Drawing.Size(1264, 681);
             this.Controls.Add(this.scoreLabel);
             this.Controls.Add(this.enemy);

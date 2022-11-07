@@ -8,6 +8,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 /* TO-DO
  * -> Add Results.cs form after the game ends and store score and date in scores.json [P1]
@@ -27,7 +29,7 @@ namespace Space_Game
         private int elapsedSeconds = 1;
         private Label announceLabel = new Label { Text = "", AutoSize = false, 
             Font = new Font("Niagara Engraved",196), TextAlign = ContentAlignment.MiddleCenter, 
-            BackColor = Color.Transparent, ForeColor = Color.White,
+            BackColor = System.Drawing.Color.Transparent, ForeColor = System.Drawing.Color.White,
             Location = new Point(0, 0)};
         private string getTime() { return TimeSpan.FromSeconds(elapsedSeconds).ToString(@"mm\:ss"); }
         private Timer onOpenTimer = new Timer { Interval = 1000 };
@@ -39,7 +41,7 @@ namespace Space_Game
         private Size vehicleSize;
 
         //bullet variables
-        private List<List<PictureBox>> bullets = new List<List<PictureBox>>();
+        private List<Tuple<PictureBox,Label>> bullets = new List<Tuple<PictureBox,Label>>();
         private Timer bulletTimer = new Timer { Interval = 25 };
         int bulletSpeed = 30;
 
@@ -49,7 +51,7 @@ namespace Space_Game
         private Keys kdk = Keys.None;
             
         private Timer enemyMovementTimer = new Timer { Interval = 50 };
-        private double sweepProbability = 0.01;
+        private double sweepProbability = 0.005;
 
         private int wait = 0;
         private int waitTickAmt = 7;
@@ -62,7 +64,7 @@ namespace Space_Game
         private bool begin = false;
 
         //paths
-        private string spritePath = "../../Sprites/";
+        private string projectPath = "../../";
 
         //debugging
         private bool openLog = true;
@@ -79,7 +81,7 @@ namespace Space_Game
             gameTimer.Tick += GameTimer_Tick;
             enemyMovementTimer.Tick += EnemyMovementTimer_Tick;
             onOpenTimer.Tick += OnOpenTimer_Tick;
-            
+
             if (openLog)
             {
                 logger = new Logger();
@@ -209,19 +211,19 @@ namespace Space_Game
         {
             foreach (var bullet in bullets.ToList())
             {
-                if (bullet[0] == p) FireBullet(bullet[1], 1);
-                if (bullet[0] == enemy) FireBullet(bullet[1], -1);
+                if (bullet.Item1 == p) { FireBullet(bullet.Item2, 1);}
+                if (bullet.Item1 == enemy) { FireBullet(bullet.Item2, -1);}
 
                 //Despawn bullet if it goes off screen
                 //condition = top of window OR bottom of window
-                if (bullet[1].Location.Y <= -bullet[1].Height || bullet[1].Location.Y >= Height) clearBullet(bullet);
+                if (bullet.Item2.Location.Y <= -bullet.Item2.Height || bullet.Item2.Location.Y >= Height) clearBullet(bullet);
                 
                 //Despawn bullet if it hits enemy
                 #region Enemy Location Conditions
-                bool e_xLeftBound = bullet[1].Location.X > enemy.Location.X;
-                bool e_xRightBound = bullet[1].Location.X < enemy.Location.X + enemy.Width + bullet[1].Width;
+                bool e_xLeftBound = bullet.Item2.Location.X > enemy.Location.X;
+                bool e_xRightBound = bullet.Item2.Location.X < enemy.Location.X + enemy.Width + bullet.Item2.Width;
                 #endregion
-                if ((e_xLeftBound && e_xRightBound) && bullet[1].Location.Y <= enemy.Location.Y + enemy.Height)
+                if ((e_xLeftBound && e_xRightBound) && bullet.Item2.Location.Y <= enemy.Location.Y + enemy.Height)
                 {
                     clearBullet(bullet);
                     score += 2;
@@ -231,10 +233,10 @@ namespace Space_Game
 
                 //Despawn bullet if it hits player
                 #region Player Location Conditions
-                bool p_xLeftBound = bullet[1].Location.X > p.Location.X;
-                bool p_xRightBound = bullet[1].Location.X < p.Location.X + p.Width + bullet[1].Width;
+                bool p_xLeftBound = bullet.Item2.Location.X > p.Location.X;
+                bool p_xRightBound = bullet.Item2.Location.X < p.Location.X + p.Width + bullet.Item2.Width;
                 #endregion
-                if ((p_xLeftBound && p_xRightBound) && bullet[1].Location.Y + bullet[1].Height >= p.Location.Y)
+                if ((p_xLeftBound && p_xRightBound) && bullet.Item2.Location.Y + bullet.Item2.Height >= p.Location.Y)
                 {
                     clearBullet(bullet);
                     logger.logBox.AppendText($"{getTime()} - Player hit!" + Environment.NewLine);
@@ -471,21 +473,21 @@ namespace Space_Game
         #region Bullet Mechanics
         void SpawnBullet(Point currentEntityLoc)
         {
-            PictureBox bullet = new PictureBox();
-            bullet.SizeMode = PictureBoxSizeMode.StretchImage;
+            Label bullet = new Label();
+            bullet.AutoSize = false;
             bullet.Size = new Size(10, 60);
             if (currentEntityLoc.Y >= Height / 2 - 120) 
             { // Spawn bullet ABOVE the entity (player)
                 bullet.Location = new Point(currentEntityLoc.X + vehicleSize.Width / 2 - 5, currentEntityLoc.Y - vehicleSize.Height / 2 + 6);
-                bullet.Image = Image.FromFile($"{spritePath}bullet.png");
-                bullets.Add(new List<PictureBox>{p,bullet});
+                bullet.BackColor = System.Drawing.Color.FromArgb(255, 255, 30, 80);
+                bullets.Add(new Tuple<PictureBox, Label>(p, bullet));
 
             }
             else
             { // Spawn bullet BELOW the entity (enemy)
                 bullet.Location = new Point(currentEntityLoc.X + vehicleSize.Width / 2 - 5, currentEntityLoc.Y + vehicleSize.Height / 2 + 6);
-                bullet.Image = Image.FromFile($"{spritePath}bullet_enemy.png");
-                bullets.Add(new List<PictureBox> { enemy, bullet });
+                bullet.BackColor = System.Drawing.Color.FromArgb(255, 40, 255, 80);
+                bullets.Add(new Tuple<PictureBox,Label>(enemy,bullet));
             }
             Controls.Add(bullet);
             bulletTimer.Start();
@@ -499,7 +501,7 @@ namespace Space_Game
         /// 1 -> Moves up (from bigger Y to smaller Y) |
         /// -1 -> Moves down (from smaller Y to bigger Y
         /// </param>
-        void FireBullet(PictureBox bullet, int direction)
+        void FireBullet(Label bullet, int direction)
         {
             if (direction == -1 || direction == 1)
             {
@@ -508,9 +510,7 @@ namespace Space_Game
             else throw new Exception("Bullet is bi-directional, it takes direction = -1 or 1.");
         }
 
-        
-
-        void FireBullet(PictureBox bullet, int direction, double speedMultiplier)
+        void FireBullet(Label bullet, int direction, double speedMultiplier)
         {
             if (direction == -1 || direction == 1)
             {
@@ -522,13 +522,13 @@ namespace Space_Game
         /// <summary>
         /// Remove bullet from list and controls to avoid extra unnecessary memory usage
         /// </summary>
-        void clearBullet(List<PictureBox> bullet)
+        void clearBullet(Tuple<PictureBox,Label> bullet)
         {
-            Controls.Remove(bullet[1]);
+            Controls.Remove(bullet.Item2);
             bullets.Remove(bullet);
         }
-        void ClearAllBullets(List<List<PictureBox>> bullets){ foreach (var bullet in bullets.ToList()) clearBullet(bullet); }
+        void ClearAllBullets(List<Tuple<PictureBox, Label>> bullets){ foreach (var bullet in bullets.ToList()) clearBullet(bullet); }
         #endregion
-        
+
     }
 }
