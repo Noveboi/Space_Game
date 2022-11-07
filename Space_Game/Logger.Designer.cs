@@ -31,6 +31,8 @@
             this.logBox = new System.Windows.Forms.TextBox();
             this.moveBox = new System.Windows.Forms.TextBox();
             this.posBox = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // logBox
@@ -69,11 +71,31 @@
             this.posBox.TabIndex = 3;
             this.posBox.Text = "Test text";
             // 
+            // label1
+            // 
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(12, 451);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(308, 41);
+            this.label1.TabIndex = 4;
+            this.label1.Text = "label1";
+            // 
+            // label2
+            // 
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(12, 492);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(308, 41);
+            this.label2.TabIndex = 5;
+            this.label2.Text = "label2";
+            // 
             // Logger
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1084, 621);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.posBox);
             this.Controls.Add(this.moveBox);
             this.Controls.Add(this.logBox);
@@ -92,5 +114,7 @@
         public System.Windows.Forms.TextBox logBox;
         public System.Windows.Forms.TextBox moveBox;
         public System.Windows.Forms.TextBox posBox;
+        public System.Windows.Forms.Label label1;
+        public System.Windows.Forms.Label label2;
     }
 }

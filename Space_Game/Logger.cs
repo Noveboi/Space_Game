@@ -17,6 +17,8 @@ namespace Space_Game
         {
             InitializeComponent();
             resizeBoxes();
+            label1.Location = new Point(label1.Location.X, posBox.Height + 30);
+            label2.Location = new Point(label1.Location.X, posBox.Height + label1.Height + 10);
 
         }
 
@@ -32,6 +34,9 @@ namespace Space_Game
         private void Logger_Resize(object sender, EventArgs e)
         {
             resizeBoxes();
+            label1.Location = new Point(label1.Location.X, posBox.Height + 30);
+            label2.Location = new Point(label1.Location.X, posBox.Height + label1.Height + 10);
+
         }
 
         private void resizeBoxes()

@@ -8,8 +8,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 /* TO-DO
  * -> Add Results.cs form after the game ends and store score and date in scores.json [P1]
@@ -35,6 +33,10 @@ namespace Space_Game
         private Timer onOpenTimer = new Timer { Interval = 1000 };
         private int countdown = 3;
 
+        //stars
+        private Timer starAnimateTimer = new Timer { Interval = 40 };
+        private List<Tuple<Label,int>> stars = new List<Tuple<Label, int>>();
+        private int counter = 0;
 
         //spacecraft vehicle attributes
         private int vehicleSpeed;
@@ -63,9 +65,6 @@ namespace Space_Game
         private bool moreLeft = false;
         private bool begin = false;
 
-        //paths
-        private string projectPath = "../../";
-
         //debugging
         private bool openLog = true;
         Logger logger;
@@ -81,6 +80,7 @@ namespace Space_Game
             gameTimer.Tick += GameTimer_Tick;
             enemyMovementTimer.Tick += EnemyMovementTimer_Tick;
             onOpenTimer.Tick += OnOpenTimer_Tick;
+            starAnimateTimer.Tick += StarAnimateTimer_Tick;
 
             if (openLog)
             {
@@ -93,12 +93,73 @@ namespace Space_Game
             announceLabel.Size = new Size(Width + 20, Height - 50);
         }
 
+        
+
         void PauseGame()
         {
             bulletTimer.Stop();
             enemyMovementTimer.Stop();
             gameTimer.Stop();
+            starAnimateTimer.Stop();
         }
+        #region Star Creation
+        Color randomBrightness()
+        {
+            int b = (RandomNumberGenerator.Create().GetHashCode() % 55) + 200;
+            return Color.FromArgb(255, b, b, b);
+        }
+
+        Point randomLocation()
+        {
+            int x = RandomNumberGenerator.Create().GetHashCode() % Width;
+            int y = RandomNumberGenerator.Create().GetHashCode() % Height;
+            return new Point(x, y);
+        }
+        Point randomLocation(int yOffset)
+        {
+            int x = RandomNumberGenerator.Create().GetHashCode() % Width;
+            int y = RandomNumberGenerator.Create().GetHashCode() % Height;
+            y += yOffset;
+            return new Point(x, y);
+        }
+
+        Size randomSize()
+        {
+            int s = (RandomNumberGenerator.Create().GetHashCode() % 3) + 3;
+            return new Size(s, s);
+        }
+
+        void CreateStars(int amount)
+        {
+            for (int i = 0; i < amount; i++)
+            {
+                Label star = new Label();
+                star.AutoSize = false;
+                star.Size = randomSize();
+                star.Text = null;
+                star.BackColor = randomBrightness();
+                star.Location = randomLocation();
+                stars.Add(new Tuple<Label,int>(star, (RandomNumberGenerator.Create().GetHashCode() % 6) + 3));
+                Controls.Add(star);
+                Controls.SetChildIndex(star, -1);
+            }
+        }
+        void CreateStars(int amount, int yOffset)
+        {
+            logger.logBox.AppendText($"{amount} stars created with y-offset {yOffset}");
+            for (int i = 0; i < amount; i++)
+            {
+                Label star = new Label();
+                star.AutoSize = false;
+                star.Size = randomSize();
+                star.BackColor = randomBrightness();
+                star.Location = randomLocation(yOffset);
+                stars.Add(new Tuple<Label, int>(star, (RandomNumberGenerator.Create().GetHashCode() % 6) + 3));
+                Controls.Add(star);
+                Controls.SetChildIndex(star, -1);
+            }
+        }
+        #endregion
         private void Game_Load(object sender, EventArgs e)
         {
             vehicleSpeed = 20;
@@ -109,7 +170,7 @@ namespace Space_Game
 
             Controls.SetChildIndex(timeLabel, -1);
             Controls.SetChildIndex(scoreLabel, -1);
-
+            CreateStars(30);
             Focus();
 
             onOpenTimer.Start();
@@ -124,10 +185,26 @@ namespace Space_Game
                 MessageBox.Show("Are you sure you want to exit? If yes, this run will not be recorded.", "Woah!", MessageBoxButtons.YesNo);
             }
         }
-
         #endregion
 
         #region Timers
+        private void StarAnimateTimer_Tick(object sender, EventArgs e)
+        {
+            if (counter == 50) CreateStars(25,Height);
+            logger.label1.Text = $"Exising stars: {stars.Count}";
+            foreach (var star in stars.ToList())
+            {
+                star.Item1.Location = new Point(star.Item1.Location.X, (star.Item1.Location.Y - star.Item2/2));
+                if (star.Item1.Location.Y < 0)
+                {
+                    Controls.Remove(star.Item1);
+                    stars.Remove(star);
+                }
+            }
+            //(% n) = reset every n ticks
+            counter = (counter + 1) % 200;
+            
+        }
         private void EnemyMovementTimer_Tick(object sender, EventArgs e)
         {
             string time = getTime();
@@ -190,7 +267,6 @@ namespace Space_Game
             elapsedSeconds++;
 
         }
-
         private void OnOpenTimer_Tick(object sender, EventArgs e)
         {
             if (countdown == -1)
@@ -199,6 +275,7 @@ namespace Space_Game
                 onOpenTimer.Stop();
                 gameTimer.Start();
                 enemyMovementTimer.Start();
+                starAnimateTimer.Start();
             }
             if (countdown == 3) Controls.Add(announceLabel);
             if (countdown != 0) announceLabel.Text = countdown.ToString();
@@ -206,9 +283,10 @@ namespace Space_Game
             
             countdown--;
         }
-
         private void BulletTimer_Tick(object sender, EventArgs e)
         {
+
+            logger.label2.Text = $"Existing bullets: {bullets.Count}";
             foreach (var bullet in bullets.ToList())
             {
                 if (bullet.Item1 == p) { FireBullet(bullet.Item2, 1);}
@@ -244,11 +322,8 @@ namespace Space_Game
                     scoreLabel.Text = score.ToString();
 
                 }
-
-
             }
         }
-
         private void PlayerMovementTimer_Tick(object sender, EventArgs e) { PlayerMove(); }
         #endregion
 
