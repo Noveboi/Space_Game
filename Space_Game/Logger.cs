@@ -47,7 +47,7 @@ namespace Space_Game
             if (proportions > 3 || proportions <= 2) throw new Exception("Cannot have posBox being larger than the other 2");
             logBox.Size = new Size((int)(Width / proportions), height);
             moveBox.Size = new Size((int)(Width / proportions), height);
-            posBox.Size = new Size((int)((proportions - 2) * Width / proportions), height);
+            posBox.Size = new Size((int)((proportions - 2) * Width / proportions) - 40, height);
         }
     }
 }
