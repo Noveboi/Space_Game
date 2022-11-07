@@ -32,7 +32,7 @@ namespace Space_Game
         private Size vehicleSize;
 
         //bullet variables
-        private List<PictureBox> bullets = new List<PictureBox>();
+        private List<List<PictureBox>> bullets = new List<List<PictureBox>>();
         private Timer bulletTimer = new Timer { Interval = 25 };
         int bulletSpeed = 30;
 
@@ -128,6 +128,11 @@ namespace Space_Game
             {
                 logger.moveBox.AppendText($"{getTime()} - {dec} | ");
                 enemyMove_Sporadic();
+                if (dec % 6 == 0)
+                {
+                    SpawnBullet(enemy.Location);
+                    bulletTimer.Start();
+                }
             }
         }
         private void GameTimer_Tick(object sender, EventArgs e)
@@ -158,23 +163,35 @@ namespace Space_Game
         {
             foreach (var bullet in bullets.ToList())
             {
-                TranslateBullet(bullet, 1);
+                if (bullet[0] == p) TranslateBullet(bullet[1], 1);
+                if (bullet[0] == enemy) TranslateBullet(bullet[1], -1);
 
                 //Despawn bullet if it goes off screen
-                if(bullet.Location.Y <= -bullet.Height)
+                //condition = top of window OR bottom of window
+                if (bullet[1].Location.Y <= -bullet[1].Height || bullet[1].Location.Y >= Height)
                 {
                     clearBullet(bullet);
                 }
 
                 //Despawn bullet if it hits enemy
-                bool xLeftBound = bullet.Location.X > enemy.Location.X;
-                bool xRightBound = bullet.Location.X < enemy.Location.X + enemy.Width + bullet.Width;
-                if ((xLeftBound && xRightBound) && bullet.Location.Y <= enemy.Location.Y + enemy.Height)
+                bool e_xLeftBound = bullet[1].Location.X > enemy.Location.X;
+                bool e_xRightBound = bullet[1].Location.X < enemy.Location.X + enemy.Width + bullet[1].Width;
+                if ((e_xLeftBound && e_xRightBound) && bullet[1].Location.Y <= enemy.Location.Y + enemy.Height)
                 {
                     clearBullet(bullet);
-                    logger.logBox.AppendText("Enemy Hit!"+Environment.NewLine);
+                    logger.logBox.AppendText($"{getTime()} - Enemy Hit!"+Environment.NewLine);
                     //ADD SCORE AND STUFF
                 }
+                //Despawn bullet if it hits player
+                bool p_xLeftBound = bullet[1].Location.X > p.Location.X;
+                bool p_xRightBound = bullet[1].Location.X < p.Location.X + p.Width + bullet[1].Width;
+                if((p_xLeftBound && p_xRightBound) && bullet[1].Location.Y + bullet[1].Height >= p.Location.Y)
+                {
+                    clearBullet(bullet);
+                    logger.logBox.AppendText($"{getTime()} - Player hit!" + Environment.NewLine);
+                }
+
+
             }
         }
 
@@ -423,19 +440,22 @@ namespace Space_Game
         void SpawnBullet(Point currentEntityLoc)
         {
             PictureBox bullet = new PictureBox();
-            bullet.Image = Image.FromFile($"{spritePath}bullet.png");
             bullet.SizeMode = PictureBoxSizeMode.StretchImage;
             bullet.Size = new Size(10, 60);
             if (currentEntityLoc.Y >= Height / 2 - 120) 
             { // Spawn bullet ABOVE the entity (player)
                 bullet.Location = new Point(currentEntityLoc.X + vehicleSize.Width / 2 - 5, currentEntityLoc.Y - vehicleSize.Height / 2 + 6);
+                bullet.Image = Image.FromFile($"{spritePath}bullet.png");
+                bullets.Add(new List<PictureBox>{p,bullet});
+
             }
             else
             { // Spawn bullet BELOW the entity (enemy)
                 bullet.Location = new Point(currentEntityLoc.X + vehicleSize.Width / 2 - 5, currentEntityLoc.Y + vehicleSize.Height / 2 + 6);
+                bullet.Image = Image.FromFile($"{spritePath}bullet_enemy.png");
+                bullets.Add(new List<PictureBox> { enemy, bullet });
             }
             Controls.Add(bullet);
-            bullets.Add(bullet);
         }
 
         /// <summary>
@@ -466,9 +486,9 @@ namespace Space_Game
         /// <summary>
         /// Remove bullet from list and controls to avoid extra unnecessary memory usage
         /// </summary>
-        void clearBullet(PictureBox bullet)
+        void clearBullet(List<PictureBox> bullet)
         {
-            Controls.Remove(bullet);
+            Controls.Remove(bullet[1]);
             bullets.Remove(bullet);
         }
         #endregion
