@@ -21,6 +21,8 @@ namespace Space_Game
         private Label pauseLabel = new Label { Text = "GAME PAUSED", AutoSize = false, 
             Font = new Font("Niagara Engraved",196), TextAlign = ContentAlignment.MiddleCenter, 
             BackColor = Color.Transparent, ForeColor = Color.White};
+        private string getTime() { return TimeSpan.FromSeconds(elapsedSeconds).ToString(@"mm\:ss"); }
+
 
         //player attributes
         private int vehicleSpeed;
@@ -44,7 +46,6 @@ namespace Space_Game
         private bool sweep = false;
         //Initiate Sweep movement (Start the procedure) and the opposite
         private bool startSweep = false;
-        private bool finishSweep = false;
         //Gather if current enemy position if more to the left of the window or otherwise
         private bool moreLeft = false;
         private bool begin = false;
@@ -81,7 +82,7 @@ namespace Space_Game
         #region Timers
         private void EnemyMovementTimer_Tick(object sender, EventArgs e)
         {
-            string time = TimeSpan.FromSeconds(elapsedSeconds).ToString(@"mm\:ss");
+            string time = getTime();
             logger.posBox.AppendText($"{time} - Enemy: {enemy.Location} {Environment.NewLine} Player: {p.Location} {Environment.NewLine}");
 
             int maxRand = (int)(1/sweepProbability);
@@ -91,7 +92,7 @@ namespace Space_Game
             //Condition to begin sweep
             if (dec == maxRand && !startSweep) startSweep = true;
             #region Sweep Movement 
-            if (startSweep && !finishSweep) {
+            if (startSweep) {
                 //Determine ONCE if enemy is moreLeft
                 if (!begin && enemyIsMoreLeft()) moreLeft = true;
                 if (!begin) begin = true; //So as to not trigger the above if statement again
@@ -124,7 +125,7 @@ namespace Space_Game
         private void GameTimer_Tick(object sender, EventArgs e)
         {
             if (elapsedSeconds > 120) { gameTimer.Stop(); return; }
-            timeLabel.Text = TimeSpan.FromSeconds(elapsedSeconds).ToString(@"mm\:ss");
+            timeLabel.Text = getTime();
             elapsedSeconds++;
 
         }
@@ -147,7 +148,7 @@ namespace Space_Game
                 if ((xLeftBound && xRightBound) && bullet.Location.Y <= enemy.Location.Y + enemy.Height)
                 {
                     clearBullet(bullet);
-                    logger.logBox.AppendText("Enemy Hit!!!!"+Environment.NewLine);
+                    logger.logBox.AppendText("Enemy Hit!"+Environment.NewLine);
                     //ADD SCORE AND STUFF
                 }
             }
@@ -382,12 +383,12 @@ namespace Space_Game
             }
             else if (moreLeft && sweep)
             {
-                if (!reachedRight) { MoveRight(enemy); return 2; }
+                if (!reachedRight) { MoveRight(enemy,2); return 2; }
                 else return 3;
             }
             else
             {
-                if(!reachedLeft) { MoveLeft(enemy); return 2; }
+                if(!reachedLeft) { MoveLeft(enemy,2); return 2; }
                 return 3;
             }
         }

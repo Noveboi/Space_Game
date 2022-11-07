@@ -36,7 +36,7 @@
             // logBox
             // 
             this.logBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.logBox.Location = new System.Drawing.Point(13, 13);
+            this.logBox.Location = new System.Drawing.Point(13, 12);
             this.logBox.Multiline = true;
             this.logBox.Name = "logBox";
             this.logBox.ReadOnly = true;
@@ -48,12 +48,12 @@
             // moveBox
             // 
             this.moveBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.moveBox.Location = new System.Drawing.Point(566, 12);
+            this.moveBox.Location = new System.Drawing.Point(725, 13);
             this.moveBox.Multiline = true;
             this.moveBox.Name = "moveBox";
             this.moveBox.ReadOnly = true;
             this.moveBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.moveBox.Size = new System.Drawing.Size(306, 437);
+            this.moveBox.Size = new System.Drawing.Size(347, 437);
             this.moveBox.TabIndex = 2;
             this.moveBox.Text = "Test text";
             // 
@@ -73,14 +73,15 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(884, 461);
+            this.ClientSize = new System.Drawing.Size(1084, 621);
             this.Controls.Add(this.posBox);
             this.Controls.Add(this.moveBox);
             this.Controls.Add(this.logBox);
             this.Name = "Logger";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.WindowsDefaultBounds;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Logger";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Logger_FormClosing);
+            this.Resize += new System.EventHandler(this.Logger_Resize);
             this.ResumeLayout(false);
             this.PerformLayout();
 
