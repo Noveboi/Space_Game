@@ -89,7 +89,8 @@ namespace Space_Game
         private void EnemyMovementTimer_Tick(object sender, EventArgs e)
         {
             string time = getTime();
-            logger.posBox.AppendText($"{time} - Enemy: {enemy.Location} {Environment.NewLine} Player: {p.Location} {Environment.NewLine}");
+            logger.posBox.AppendText($"{time} - Enemy: {enemy.Location} {Environment.NewLine}            " +
+                $"Player: {p.Location} {Environment.NewLine}");
 
             int maxRand = (int)(1/sweepProbability);
             //Random decision
@@ -119,13 +120,13 @@ namespace Space_Game
                     sweep = false;
                     begin = false;
                 }
-                logger.moveBox.AppendText($"Enemy Sweeping! (st = {s}, w = {wait}, sw = {sweep}{Environment.NewLine})");
+                logger.moveBox.AppendText($"{getTime()} - Sweeping! (st={s}, w={wait}, sw={sweep}){Environment.NewLine}");
             }
             #endregion
 
             if (dec > 0 && dec <= maxRand - 1 && !startSweep)
             {
-                logger.moveBox.AppendText($"{dec} | Enemy moving sporadically!" + Environment.NewLine);
+                logger.moveBox.AppendText($"{getTime()} - {dec} | ");
                 enemyMove_Sporadic();
             }
         }
@@ -148,7 +149,7 @@ namespace Space_Game
             }
             if (countdown == 3) Controls.Add(announceLabel);
             if (countdown != 0) announceLabel.Text = countdown.ToString();
-            if (countdown == 0)announceLabel.Text = "FIGHT!";
+            if (countdown == 0) announceLabel.Text = "FIGHT!";
             
             countdown--;
         }
@@ -227,8 +228,8 @@ namespace Space_Game
                     //Fire a bullet
                     case Keys.Space:
                         SpawnBullet(p.Location);
-                        logger.logBox.AppendText($"Bullet Fired at {p.Location}{Environment.NewLine}");
-                        logger.logBox.AppendText($"Total Bullets Alive: {bullets.Count}{Environment.NewLine}");
+                        logger.logBox.AppendText($"{getTime()} - Bullet Fired at " +
+                            $"{new Point(p.Location.X + vehicleSize.Width / 2 - 5,p.Location.Y)}{Environment.NewLine}");
                         bulletTimer.Start();
                         break;
                 }
@@ -362,8 +363,11 @@ namespace Space_Game
 
                 if (moveDirection >= 0 && moveDirection < 25) MoveLeft(enemy, moveWeight);
                 if (moveDirection >= 25 && moveDirection <= 50) MoveRight(enemy, 6-moveWeight);
-                
+                logger.moveBox.AppendText($"Move Sporadic!" + Environment.NewLine);
 
+            } else
+            {
+                logger.moveBox.AppendText("No Move!" + Environment.NewLine);
             }
         }
         /// <summary>
