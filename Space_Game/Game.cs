@@ -9,7 +9,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-
+/* TO-DO
+ * -> Add Results.cs form after the game ends and store score and date in scores.json [P1]
+ * -> Make Scores.cs form functional (cooperate with scores.json) [P2]
+ * -> Add sounds (enemy bullet fire, player bullet fire, enemy hit, player hit, main menu select, main menu mouseEnter label) [P3]
+ * -> Add background music (main menu, game) [P4]
+ */
 namespace Space_Game
 {
     public partial class Game : Form
@@ -64,6 +69,8 @@ namespace Space_Game
         Logger logger;
 
         #endregion
+
+        #region Game Methods and Events
         public Game()
         {
             InitializeComponent();
@@ -107,6 +114,16 @@ namespace Space_Game
 
             enemy.Location = new Point(Width/2 - enemy.Width/2, enemy.Location.Y);
         }
+
+        private void Game_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                MessageBox.Show("Are you sure you want to exit? If yes, this run will not be recorded.", "Woah!", MessageBoxButtons.YesNo);
+            }
+        }
+
+        #endregion
 
         #region Timers
         private void EnemyMovementTimer_Tick(object sender, EventArgs e)
@@ -376,7 +393,7 @@ namespace Space_Game
         }
         #endregion
 
-        #region Enemy Movement and Attack Methods (inherits from Player)
+        #region Enemy Movement and Attack Methods (Inherits Move Methods from Player)
 
         bool enemyIsMoreLeft() { return enemy.Location.X < Width / 2 ? true : false; }
         /// <summary>
@@ -491,13 +508,7 @@ namespace Space_Game
             else throw new Exception("Bullet is bi-directional, it takes direction = -1 or 1.");
         }
 
-        private void Game_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if(e.CloseReason == CloseReason.UserClosing)
-            {
-                MessageBox.Show("Are you sure you want to exit? If yes, this run will not be recorded.","Woah!",MessageBoxButtons.YesNo);
-            }
-        }
+        
 
         void FireBullet(PictureBox bullet, int direction, double speedMultiplier)
         {
@@ -516,10 +527,7 @@ namespace Space_Game
             Controls.Remove(bullet[1]);
             bullets.Remove(bullet);
         }
-        void ClearAllBullets(List<List<PictureBox>> bullets)
-        {
-            foreach (var bullet in bullets.ToList()) clearBullet(bullet);
-        }
+        void ClearAllBullets(List<List<PictureBox>> bullets){ foreach (var bullet in bullets.ToList()) clearBullet(bullet); }
         #endregion
         
     }

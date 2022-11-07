@@ -146,7 +146,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <None Include="settings.json" />
-    <None Include="top10.json" />
+    <None Include="scores.json" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
