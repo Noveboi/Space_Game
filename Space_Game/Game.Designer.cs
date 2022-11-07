@@ -32,6 +32,7 @@
             this.p = new System.Windows.Forms.PictureBox();
             this.timeLabel = new System.Windows.Forms.Label();
             this.enemy = new System.Windows.Forms.PictureBox();
+            this.scoreLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.p)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.enemy)).BeginInit();
             this.SuspendLayout();
@@ -50,6 +51,7 @@
             // timeLabel
             // 
             this.timeLabel.AutoSize = true;
+            this.timeLabel.BackColor = System.Drawing.Color.Transparent;
             this.timeLabel.Font = new System.Drawing.Font("Niagara Solid", 72F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.timeLabel.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
             this.timeLabel.Location = new System.Drawing.Point(12, 569);
@@ -68,12 +70,25 @@
             this.enemy.TabIndex = 2;
             this.enemy.TabStop = false;
             // 
+            // scoreLabel
+            // 
+            this.scoreLabel.BackColor = System.Drawing.Color.Transparent;
+            this.scoreLabel.Font = new System.Drawing.Font("Niagara Solid", 128.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.scoreLabel.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.scoreLabel.Location = new System.Drawing.Point(1053, 502);
+            this.scoreLabel.Name = "scoreLabel";
+            this.scoreLabel.Size = new System.Drawing.Size(199, 170);
+            this.scoreLabel.TabIndex = 3;
+            this.scoreLabel.Text = "SC";
+            this.scoreLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // Game
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.DarkSlateBlue;
             this.ClientSize = new System.Drawing.Size(1264, 681);
+            this.Controls.Add(this.scoreLabel);
             this.Controls.Add(this.enemy);
             this.Controls.Add(this.timeLabel);
             this.Controls.Add(this.p);
@@ -94,5 +109,6 @@
         private System.Windows.Forms.PictureBox p;
         private System.Windows.Forms.Label timeLabel;
         private System.Windows.Forms.PictureBox enemy;
+        private System.Windows.Forms.Label scoreLabel;
     }
 }

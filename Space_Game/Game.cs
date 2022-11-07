@@ -16,6 +16,8 @@ namespace Space_Game
     {
         #region Private Variables
         //game variables & attributes
+        private int score = 0;
+        private int gameTime = 120; //In seconds
         private Timer gameTimer = new Timer { Interval = 1000 };
         private int elapsedSeconds = 1;
         private Label announceLabel = new Label { Text = "", AutoSize = false, 
@@ -27,7 +29,7 @@ namespace Space_Game
         private int countdown = 3;
 
 
-        //player attributes
+        //spacecraft vehicle attributes
         private int vehicleSpeed;
         private Size vehicleSize;
 
@@ -37,14 +39,15 @@ namespace Space_Game
         int bulletSpeed = 30;
 
         //movement variables
-        private Timer playerMovementTimer = new Timer { Interval = 50 };
+        private Timer playerMovementTimer = new Timer { Interval = 30 };
         private bool mu, md, ml, mr;
         private Keys kdk = Keys.None;
             
         private Timer enemyMovementTimer = new Timer { Interval = 50 };
-        private double sweepProbability = 0.009;
+        private double sweepProbability = 0.01;
 
         private int wait = 0;
+        private int waitTickAmt = 7;
         //Initiate state 2 of Sweep movement
         private bool sweep = false;
         //Initiate Sweep movement (Start the procedure) and the opposite
@@ -108,7 +111,7 @@ namespace Space_Game
                 if (s == 1) wait++; //Wait 10 ticks before going to state 2
                 else if (s == 2)
                 {
-                    wait = 10;
+                    wait = waitTickAmt;
                     //this is passed to enemyMove_Sweep() and it will know that state 2 is a-go
                     if (!sweep) sweep = true; 
                 }
@@ -128,16 +131,24 @@ namespace Space_Game
             {
                 logger.moveBox.AppendText($"{getTime()} - {dec} | ");
                 enemyMove_Sporadic();
-                if (dec % 6 == 0)
+                if (dec % 5 == 0)
                 {
                     SpawnBullet(enemy.Location);
-                    bulletTimer.Start();
                 }
             }
         }
         private void GameTimer_Tick(object sender, EventArgs e)
         {
-            if (elapsedSeconds > 120) { gameTimer.Stop(); return; }
+            if (elapsedSeconds > gameTime) 
+            { 
+                gameTimer.Stop();
+                enemyMovementTimer.Stop();
+                bulletTimer.Stop();
+                clearAllBullets(bullets);
+                announceLabel.Text = "GAME OVER!";
+                Controls.Add(announceLabel);
+                return; 
+            }
             timeLabel.Text = getTime();
             elapsedSeconds++;
 
@@ -163,32 +174,38 @@ namespace Space_Game
         {
             foreach (var bullet in bullets.ToList())
             {
-                if (bullet[0] == p) TranslateBullet(bullet[1], 1);
-                if (bullet[0] == enemy) TranslateBullet(bullet[1], -1);
+                if (bullet[0] == p) FireBullet(bullet[1], 1);
+                if (bullet[0] == enemy) FireBullet(bullet[1], -1);
 
                 //Despawn bullet if it goes off screen
                 //condition = top of window OR bottom of window
-                if (bullet[1].Location.Y <= -bullet[1].Height || bullet[1].Location.Y >= Height)
-                {
-                    clearBullet(bullet);
-                }
-
+                if (bullet[1].Location.Y <= -bullet[1].Height || bullet[1].Location.Y >= Height) clearBullet(bullet);
+                
                 //Despawn bullet if it hits enemy
+                #region Enemy Location Conditions
                 bool e_xLeftBound = bullet[1].Location.X > enemy.Location.X;
                 bool e_xRightBound = bullet[1].Location.X < enemy.Location.X + enemy.Width + bullet[1].Width;
+                #endregion
                 if ((e_xLeftBound && e_xRightBound) && bullet[1].Location.Y <= enemy.Location.Y + enemy.Height)
                 {
                     clearBullet(bullet);
+                    score += 2;
+                    scoreLabel.Text = score.ToString();
                     logger.logBox.AppendText($"{getTime()} - Enemy Hit!"+Environment.NewLine);
-                    //ADD SCORE AND STUFF
                 }
+
                 //Despawn bullet if it hits player
+                #region Player Location Conditions
                 bool p_xLeftBound = bullet[1].Location.X > p.Location.X;
                 bool p_xRightBound = bullet[1].Location.X < p.Location.X + p.Width + bullet[1].Width;
-                if((p_xLeftBound && p_xRightBound) && bullet[1].Location.Y + bullet[1].Height >= p.Location.Y)
+                #endregion
+                if ((p_xLeftBound && p_xRightBound) && bullet[1].Location.Y + bullet[1].Height >= p.Location.Y)
                 {
                     clearBullet(bullet);
                     logger.logBox.AppendText($"{getTime()} - Player hit!" + Environment.NewLine);
+                    score--;
+                    scoreLabel.Text = score.ToString();
+
                 }
 
 
@@ -207,7 +224,10 @@ namespace Space_Game
             vehicleSize = p.Size;
 
             timeLabel.Text = "00:00";
+            scoreLabel.Text = "0";
+
             Controls.SetChildIndex(timeLabel, -1);
+            Controls.SetChildIndex(scoreLabel, -1);
 
             Focus();
 
@@ -247,7 +267,6 @@ namespace Space_Game
                         SpawnBullet(p.Location);
                         logger.logBox.AppendText($"{getTime()} - Bullet Fired at " +
                             $"{new Point(p.Location.X + vehicleSize.Width / 2 - 5,p.Location.Y)}{Environment.NewLine}");
-                        bulletTimer.Start();
                         break;
                 }
             }
@@ -407,10 +426,10 @@ namespace Space_Game
 
             if (moreLeft && !sweep)
             {
-                if(!reachedLeft) { MoveLeft(enemy, 1.5); return 0; }
+                if(!reachedLeft) { MoveLeft(enemy, 1.5); return 0;}
                 else 
                 {
-                    if (wait < 10) return 1;
+                    if (wait < waitTickAmt) return 1;
                     else return 2;
                 }
             } 
@@ -419,18 +438,19 @@ namespace Space_Game
                 if (!reachedRight) { MoveRight(enemy, 1.5); return 0; }
                 else
                 {
-                    if (wait < 10) return 1;
+                    if (wait < waitTickAmt) return 1;
                     else return 2;
+                    
                 }
             }
             else if (moreLeft && sweep)
             {
-                if (!reachedRight) { MoveRight(enemy,2); return 2; }
+                if (!reachedRight) { MoveRight(enemy,2); SpawnBullet(enemy.Location); return 2; }
                 else return 3;
             }
             else
             {
-                if(!reachedLeft) { MoveLeft(enemy,2); return 2; }
+                if(!reachedLeft) { MoveLeft(enemy,2); SpawnBullet(enemy.Location); return 2; }
                 return 3;
             }
         }
@@ -456,6 +476,7 @@ namespace Space_Game
                 bullets.Add(new List<PictureBox> { enemy, bullet });
             }
             Controls.Add(bullet);
+            bulletTimer.Start();
         }
 
         /// <summary>
@@ -466,7 +487,7 @@ namespace Space_Game
         /// 1 -> Moves up (from bigger Y to smaller Y) |
         /// -1 -> Moves down (from smaller Y to bigger Y
         /// </param>
-        void TranslateBullet(PictureBox bullet, int direction)
+        void FireBullet(PictureBox bullet, int direction)
         {
             if (direction == -1 || direction == 1)
             {
@@ -474,7 +495,7 @@ namespace Space_Game
             }
             else throw new Exception("Bullet is bi-directional, it takes direction = -1 or 1.");
         }
-        void TranslateBullet(PictureBox bullet, int direction, double speedMultiplier)
+        void FireBullet(PictureBox bullet, int direction, double speedMultiplier)
         {
             if (direction == -1 || direction == 1)
             {
@@ -492,5 +513,9 @@ namespace Space_Game
             bullets.Remove(bullet);
         }
         #endregion
+        void clearAllBullets(List<List<PictureBox>> bullets)
+        {
+            foreach (var bullet in bullets.ToList()) clearBullet(bullet);
+        }
     }
 }
