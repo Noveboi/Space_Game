@@ -109,7 +109,7 @@ namespace Space_Game
         {
             foreach (var bullet in bullets.ToList())
             {
-                TranslateBullet(bullet);
+                TranslateBullet(bullet, 1);
 
                 //Despawn bullet if it goes off screen
                 if(bullet.Location.Y <= -bullet.Height)
@@ -278,7 +278,9 @@ namespace Space_Game
         }
         #endregion
 
-        #region Enemy Movement Methods (inherits from Player)
+        #region Enemy Movement and Attack Methods (inherits from Player)
+
+        bool enemyIsMoreLeft() { return enemy.Location.X < Width / 2 ? true : false; }
         /// <summary>
         /// Most common enemy movement. Moves small distances, but moves very frequently.
         /// Does communicate with timer (no return type)
@@ -298,12 +300,6 @@ namespace Space_Game
 
             }
         }
-
-        bool enemyIsMoreLeft() 
-        {
-            return enemy.Location.X < Width/2 ? true : false;
-        }
-
         /// <summary>
         /// Enemy goes to one end of the window (left or right, whichever they're closest to) and 
         /// goes from that end to the other while firing bullets rapidly
@@ -354,20 +350,47 @@ namespace Space_Game
         #endregion
 
         #region Bullet Mechanics
-        void SpawnBullet(Point currentPlayerLoc)
+        void SpawnBullet(Point currentEntityLoc)
         {
             PictureBox bullet = new PictureBox();
             bullet.Image = Image.FromFile($"{spritePath}bullet.png");
             bullet.SizeMode = PictureBoxSizeMode.StretchImage;
             bullet.Size = new Size(10, 60);
-            bullet.Location = new Point(currentPlayerLoc.X + vehicleSize.Width / 2 - 5, currentPlayerLoc.Y - vehicleSize.Height / 2 + 6);
+            if (currentEntityLoc.Y >= Height / 2 - 120) 
+            { // Spawn bullet ABOVE the entity (player)
+                bullet.Location = new Point(currentEntityLoc.X + vehicleSize.Width / 2 - 5, currentEntityLoc.Y - vehicleSize.Height / 2 + 6);
+            }
+            else
+            { // Spawn bullet BELOW the entity (enemy)
+                bullet.Location = new Point(currentEntityLoc.X + vehicleSize.Width / 2 - 5, currentEntityLoc.Y + vehicleSize.Height / 2 + 6);
+            }
             Controls.Add(bullet);
             bullets.Add(bullet);
         }
 
-        void TranslateBullet(PictureBox bullet)
+        /// <summary>
+        /// Move the bullet object vertically through space
+        /// </summary>
+        /// <param name="bullet">The bullet object to move</param>
+        /// <param name="direction">
+        /// 1 -> Moves up (from bigger Y to smaller Y) |
+        /// -1 -> Moves down (from smaller Y to bigger Y
+        /// </param>
+        void TranslateBullet(PictureBox bullet, int direction)
         {
-            bullet.Location = new Point(bullet.Location.X, bullet.Location.Y - bulletSpeed);
+            if (direction == -1 || direction == 1)
+            {
+                bullet.Location = new Point(bullet.Location.X, bullet.Location.Y - bulletSpeed * direction);
+            }
+            else throw new Exception("Bullet is bi-directional, it takes direction = -1 or 1.");
+        }
+        void TranslateBullet(PictureBox bullet, int direction, double speedMultiplier)
+        {
+            if (direction == 0 || direction == 1)
+            {
+                bullet.Location = new Point(bullet.Location.X, bullet.Location.Y - (int)(bulletSpeed * direction * speedMultiplier));
+            }
+            else throw new Exception("Bullet is bi-directional, it takes direction = -1 or 1.");
         }
         #endregion
     }
