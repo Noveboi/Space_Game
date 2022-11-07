@@ -63,10 +63,6 @@ namespace Space_Game
         private bool openLog = true;
         Logger logger;
 
-        public class EnemyInfo
-        {
-            int Dec { get; set; } 
-        }
         #endregion
         public Game()
         {
@@ -86,6 +82,30 @@ namespace Space_Game
             }
 
             announceLabel.Size = new Size(Width + 20, Height - 50);
+        }
+
+        void PauseGame()
+        {
+            bulletTimer.Stop();
+            enemyMovementTimer.Stop();
+            gameTimer.Stop();
+        }
+        private void Game_Load(object sender, EventArgs e)
+        {
+            vehicleSpeed = 20;
+            vehicleSize = p.Size;
+
+            timeLabel.Text = "00:00";
+            scoreLabel.Text = "0";
+
+            Controls.SetChildIndex(timeLabel, -1);
+            Controls.SetChildIndex(scoreLabel, -1);
+
+            Focus();
+
+            onOpenTimer.Start();
+
+            enemy.Location = new Point(Width/2 - enemy.Width/2, enemy.Location.Y);
         }
 
         #region Timers
@@ -140,11 +160,9 @@ namespace Space_Game
         private void GameTimer_Tick(object sender, EventArgs e)
         {
             if (elapsedSeconds > gameTime) 
-            { 
-                gameTimer.Stop();
-                enemyMovementTimer.Stop();
-                bulletTimer.Stop();
-                clearAllBullets(bullets);
+            {
+                PauseGame();
+                ClearAllBullets(bullets);
                 announceLabel.Text = "GAME OVER!";
                 Controls.Add(announceLabel);
                 return; 
@@ -212,29 +230,8 @@ namespace Space_Game
             }
         }
 
-        private void PlayerMovementTimer_Tick(object sender, EventArgs e)
-        {
-            PlayerMove();
-        }
+        private void PlayerMovementTimer_Tick(object sender, EventArgs e) { PlayerMove(); }
         #endregion
-
-        private void Game_Load(object sender, EventArgs e)
-        {
-            vehicleSpeed = 20;
-            vehicleSize = p.Size;
-
-            timeLabel.Text = "00:00";
-            scoreLabel.Text = "0";
-
-            Controls.SetChildIndex(timeLabel, -1);
-            Controls.SetChildIndex(scoreLabel, -1);
-
-            Focus();
-
-            onOpenTimer.Start();
-
-            enemy.Location = new Point(Width/2 - enemy.Width/2, enemy.Location.Y);
-        }
 
         #region Player Controls
         private void Game_KeyDown(object sender, KeyEventArgs e)
@@ -274,9 +271,7 @@ namespace Space_Game
             {
                 if (gameRunning) //Pause
                 {
-                    gameTimer.Stop();
-                    enemyMovementTimer.Stop();
-                    bulletTimer.Stop();
+                    PauseGame();
 
                     announceLabel.Text = "GAME PAUSED";
                     Controls.Add(announceLabel);
@@ -495,6 +490,15 @@ namespace Space_Game
             }
             else throw new Exception("Bullet is bi-directional, it takes direction = -1 or 1.");
         }
+
+        private void Game_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if(e.CloseReason == CloseReason.UserClosing)
+            {
+                MessageBox.Show("Are you sure you want to exit? If yes, this run will not be recorded.","Woah!",MessageBoxButtons.YesNo);
+            }
+        }
+
         void FireBullet(PictureBox bullet, int direction, double speedMultiplier)
         {
             if (direction == -1 || direction == 1)
@@ -512,10 +516,11 @@ namespace Space_Game
             Controls.Remove(bullet[1]);
             bullets.Remove(bullet);
         }
-        #endregion
-        void clearAllBullets(List<List<PictureBox>> bullets)
+        void ClearAllBullets(List<List<PictureBox>> bullets)
         {
             foreach (var bullet in bullets.ToList()) clearBullet(bullet);
         }
+        #endregion
+        
     }
 }

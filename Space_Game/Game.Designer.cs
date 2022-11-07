@@ -72,12 +72,13 @@
             // 
             // scoreLabel
             // 
+            this.scoreLabel.AutoSize = true;
             this.scoreLabel.BackColor = System.Drawing.Color.Transparent;
             this.scoreLabel.Font = new System.Drawing.Font("Niagara Solid", 128.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.scoreLabel.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.scoreLabel.Location = new System.Drawing.Point(1053, 502);
+            this.scoreLabel.Location = new System.Drawing.Point(1076, 489);
             this.scoreLabel.Name = "scoreLabel";
-            this.scoreLabel.Size = new System.Drawing.Size(199, 170);
+            this.scoreLabel.Size = new System.Drawing.Size(176, 183);
             this.scoreLabel.TabIndex = 3;
             this.scoreLabel.Text = "SC";
             this.scoreLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -94,6 +95,7 @@
             this.Controls.Add(this.p);
             this.Name = "Game";
             this.Text = "Game";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Game_FormClosing);
             this.Load += new System.EventHandler(this.Game_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Game_KeyDown);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Game_KeyUp);
