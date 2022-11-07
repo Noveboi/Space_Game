@@ -16,7 +16,7 @@ namespace Space_Game
         #region Private Variables
         //game variables
         private Timer gameTimer = new Timer { Interval = 1000 };
-        private int elapsedSeconds = 0;
+        private int elapsedSeconds = 1;
 
         //player attributes
         private int vehicleSpeed;
@@ -145,7 +145,7 @@ namespace Space_Game
 
             Focus();
 
-            timeLabel.Text = "";
+            timeLabel.Text = "00:00";
             gameTimer.Start();
             enemyMovementTimer.Start();
             Controls.SetChildIndex(timeLabel, -1);
@@ -189,6 +189,9 @@ namespace Space_Game
                 case Keys.P:
                     if (log.Visible) log.Hide();
                     else log.Show();
+                    break;
+                case Keys.Escape:
+                    Close();
                     break;
             }
             PlayerMove();
