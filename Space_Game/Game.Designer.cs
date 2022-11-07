@@ -30,7 +30,6 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Game));
             this.p = new System.Windows.Forms.PictureBox();
-            this.log = new System.Windows.Forms.TextBox();
             this.timeLabel = new System.Windows.Forms.Label();
             this.enemy = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.p)).BeginInit();
@@ -47,21 +46,6 @@
             this.p.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.p.TabIndex = 0;
             this.p.TabStop = false;
-            // 
-            // log
-            // 
-            this.log.BackColor = System.Drawing.Color.GhostWhite;
-            this.log.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.log.Enabled = false;
-            this.log.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.log.ForeColor = System.Drawing.SystemColors.Menu;
-            this.log.Location = new System.Drawing.Point(12, 12);
-            this.log.Multiline = true;
-            this.log.Name = "log";
-            this.log.ReadOnly = true;
-            this.log.Size = new System.Drawing.Size(200, 300);
-            this.log.TabIndex = 0;
-            this.log.TabStop = false;
             // 
             // timeLabel
             // 
@@ -92,7 +76,6 @@
             this.ClientSize = new System.Drawing.Size(1264, 681);
             this.Controls.Add(this.enemy);
             this.Controls.Add(this.timeLabel);
-            this.Controls.Add(this.log);
             this.Controls.Add(this.p);
             this.Name = "Game";
             this.Text = "Game";
@@ -109,7 +92,6 @@
         #endregion
 
         private System.Windows.Forms.PictureBox p;
-        private System.Windows.Forms.TextBox log;
         private System.Windows.Forms.Label timeLabel;
         private System.Windows.Forms.PictureBox enemy;
     }

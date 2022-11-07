@@ -18,10 +18,13 @@ namespace Space_Game
         //game variables & attributes
         private Timer gameTimer = new Timer { Interval = 1000 };
         private int elapsedSeconds = 1;
-        private Label pauseLabel = new Label { Text = "GAME PAUSED", AutoSize = false, 
+        private Label announceLabel = new Label { Text = "", AutoSize = false, 
             Font = new Font("Niagara Engraved",196), TextAlign = ContentAlignment.MiddleCenter, 
-            BackColor = Color.Transparent, ForeColor = Color.White};
+            BackColor = Color.Transparent, ForeColor = Color.White,
+            Location = new Point(0, 0)};
         private string getTime() { return TimeSpan.FromSeconds(elapsedSeconds).ToString(@"mm\:ss"); }
+        private Timer onOpenTimer = new Timer { Interval = 1000 };
+        private int countdown = 3;
 
 
         //player attributes
@@ -31,13 +34,13 @@ namespace Space_Game
         //bullet variables
         private List<PictureBox> bullets = new List<PictureBox>();
         private Timer bulletTimer = new Timer { Interval = 25 };
-        int bulletSpeed = 20;
+        int bulletSpeed = 30;
 
         //movement variables
         private Timer playerMovementTimer = new Timer { Interval = 50 };
         private bool mu, md, ml, mr;
         private Keys kdk = Keys.None;
-
+            
         private Timer enemyMovementTimer = new Timer { Interval = 50 };
         private double sweepProbability = 0.009;
 
@@ -69,6 +72,7 @@ namespace Space_Game
             bulletTimer.Tick += BulletTimer_Tick;
             gameTimer.Tick += GameTimer_Tick;
             enemyMovementTimer.Tick += EnemyMovementTimer_Tick;
+            onOpenTimer.Tick += OnOpenTimer_Tick;
             
             if (openLog)
             {
@@ -77,6 +81,8 @@ namespace Space_Game
                 logger.posBox.Text = "";
                 logger.moveBox.Text = "";
             }
+
+            announceLabel.Size = new Size(Width + 20, Height - 50);
         }
 
         #region Timers
@@ -110,6 +116,7 @@ namespace Space_Game
                 {
                     wait = 0;
                     startSweep = false;
+                    sweep = false;
                     begin = false;
                 }
                 logger.moveBox.AppendText($"Enemy Sweeping! (st = {s}, w = {wait}, sw = {sweep}{Environment.NewLine})");
@@ -128,6 +135,22 @@ namespace Space_Game
             timeLabel.Text = getTime();
             elapsedSeconds++;
 
+        }
+
+        private void OnOpenTimer_Tick(object sender, EventArgs e)
+        {
+            if (countdown == -1)
+            {
+                Controls.Remove(announceLabel);
+                onOpenTimer.Stop();
+                gameTimer.Start();
+                enemyMovementTimer.Start();
+            }
+            if (countdown == 3) Controls.Add(announceLabel);
+            if (countdown != 0) announceLabel.Text = countdown.ToString();
+            if (countdown == 0)announceLabel.Text = "FIGHT!";
+            
+            countdown--;
         }
 
         private void BulletTimer_Tick(object sender, EventArgs e)
@@ -165,16 +188,14 @@ namespace Space_Game
             vehicleSpeed = 20;
             vehicleSize = p.Size;
 
-            Focus();
-
             timeLabel.Text = "00:00";
-            gameTimer.Start();
-            enemyMovementTimer.Start();
             Controls.SetChildIndex(timeLabel, -1);
 
-            log.Hide();
+            Focus();
 
-            enemy.Location = new Point(Width/2, enemy.Location.Y);
+            onOpenTimer.Start();
+
+            enemy.Location = new Point(Width/2 - enemy.Width/2, enemy.Location.Y);
         }
 
         #region Player Controls
@@ -220,9 +241,8 @@ namespace Space_Game
                     enemyMovementTimer.Stop();
                     bulletTimer.Stop();
 
-                    pauseLabel.Size = new Size(Width+20, Height - 50);
-                    pauseLabel.Location = new Point(0, 0);
-                    Controls.Add(pauseLabel);
+                    announceLabel.Text = "GAME PAUSED";
+                    Controls.Add(announceLabel);
                 }
                 else //Unpause
                 {
@@ -230,7 +250,8 @@ namespace Space_Game
                     enemyMovementTimer.Start();
                     bulletTimer.Start();
 
-                    Controls.Remove(pauseLabel);
+                    Controls.Remove(announceLabel);
+
                 };  
             }
             if (e.KeyCode == Keys.P)
@@ -337,10 +358,10 @@ namespace Space_Game
             {
                 //Chance to move up to 2 times more (takes values from 1 to 2)
                 int moveDirection = RandomNumberGenerator.Create().GetHashCode() % 50;
-                double moveWeight = (double)enemy.Location.X / (double)Width * 3 + 1;
+                double moveWeight = (double)enemy.Location.X / (double)Width * 3 + 2;
 
                 if (moveDirection >= 0 && moveDirection < 25) MoveLeft(enemy, moveWeight);
-                if (moveDirection >= 25 && moveDirection <= 50) MoveRight(enemy, 4-moveWeight);
+                if (moveDirection >= 25 && moveDirection <= 50) MoveRight(enemy, 6-moveWeight);
                 
 
             }
