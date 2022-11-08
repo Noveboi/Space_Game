@@ -22,7 +22,8 @@ namespace Space_Game
         #region Private Variables
         //game variables & attributes
         private int score = 0;
-        private int gameTime = 120; //In seconds
+        private const int gameTime = 10; //In seconds
+
         private Timer gameTimer = new Timer { Interval = 1000 };
         private int elapsedSeconds = 1;
         private Label announceLabel = new Label { Text = "", AutoSize = false, 
@@ -45,7 +46,7 @@ namespace Space_Game
         //bullet variables
         private List<Tuple<PictureBox,Label>> bullets = new List<Tuple<PictureBox,Label>>();
         private Timer bulletTimer = new Timer { Interval = 25 };
-        int bulletSpeed = 30;
+        private const int bulletSpeed = 30;
 
         //movement variables
         private Timer playerMovementTimer = new Timer { Interval = 30 };
@@ -56,7 +57,7 @@ namespace Space_Game
         private double sweepProbability = 0.005;
 
         private int wait = 0;
-        private int waitTickAmt = 7;
+        private const int waitTickAmt = 7;
         //Initiate state 2 of Sweep movement
         private bool sweep = false;
         //Initiate Sweep movement (Start the procedure) and the opposite
@@ -66,7 +67,7 @@ namespace Space_Game
         private bool begin = false;
 
         //debugging
-        private bool openLog = true;
+        private bool haveLog = true;
         Logger logger;
 
         #endregion
@@ -82,7 +83,7 @@ namespace Space_Game
             onOpenTimer.Tick += OnOpenTimer_Tick;
             starAnimateTimer.Tick += StarAnimateTimer_Tick;
 
-            if (openLog)
+            if (haveLog)
             {
                 logger = new Logger();
                 logger.logBox.Text = "";
@@ -93,8 +94,30 @@ namespace Space_Game
             announceLabel.Size = new Size(Width + 20, Height - 50);
         }
 
-        
+        private void doCountdown(string annouceText, int countFrom)
+        {
+            if (countdown == -1)
+            {
+                Controls.Remove(announceLabel);
+                onOpenTimer.Stop();
+                gameTimer.Start();
+                enemyMovementTimer.Start();
+                starAnimateTimer.Start();
+            }
+            if (countdown == countFrom) Controls.Add(announceLabel);
+            if (countdown != 0) announceLabel.Text = countdown.ToString();
+            if (countdown == 0) announceLabel.Text = annouceText;
 
+            countdown--;
+        }
+
+        private void doCountdown()
+        {
+            if (countdown == -1) { Controls.Remove(announceLabel); }
+            if (countdown == 3) { Controls.Add(announceLabel); Controls.SetChildIndex(announceLabel, -1); }
+            if (countdown != 0) announceLabel.Text = countdown.ToString();
+            countdown--;
+        }
         void PauseGame()
         {
             bulletTimer.Stop();
@@ -180,7 +203,7 @@ namespace Space_Game
 
         private void Game_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (e.CloseReason == CloseReason.UserClosing)
+            if (e.CloseReason == CloseReason.UserClosing && elapsedSeconds <= gameTime)
             {
                 MessageBox.Show("Are you sure you want to exit? If yes, this run will not be recorded.", "Woah!", MessageBoxButtons.YesNo);
             }
@@ -194,7 +217,7 @@ namespace Space_Game
             logger.label1.Text = $"Exising stars: {stars.Count}";
             foreach (var star in stars.ToList())
             {
-                star.Item1.Location = new Point(star.Item1.Location.X, (star.Item1.Location.Y - star.Item2/2));
+                star.Item1.Location = new Point(star.Item1.Location.X, (star.Item1.Location.Y - star.Item2));
                 if (star.Item1.Location.Y < 0)
                 {
                     Controls.Remove(star.Item1);
@@ -202,7 +225,7 @@ namespace Space_Game
                 }
             }
             //(% n) = reset every n ticks
-            counter = (counter + 1) % 200;
+            counter = (counter + 1) % 150;
             
         }
         private void EnemyMovementTimer_Tick(object sender, EventArgs e)
@@ -255,33 +278,44 @@ namespace Space_Game
         }
         private void GameTimer_Tick(object sender, EventArgs e)
         {
-            if (elapsedSeconds > gameTime) 
+            if(elapsedSeconds >= gameTime - 3 && elapsedSeconds <= gameTime - 1)
+            {
+                if (elapsedSeconds == gameTime - 3) countdown = 3;
+                doCountdown();
+            }
+
+            if (elapsedSeconds > gameTime - 1) 
             {
                 PauseGame();
+                gameTimer.Start();
                 ClearAllBullets(bullets);
                 announceLabel.Text = "GAME OVER!";
-                Controls.Add(announceLabel);
-                return; 
+                Controls.Add(announceLabel); 
             }
-            timeLabel.Text = getTime();
+            if(elapsedSeconds > gameTime + 2)
+            {
+                gameTimer.Stop();
+                Results results = new Results(score,gameTime);
+                results.Show();
+                results.Focus();
+                results.FormClosed += (s,args) => Close();
+                Hide();
+            }
+            if (elapsedSeconds <= gameTime) timeLabel.Text = getTime();
             elapsedSeconds++;
 
         }
-        private void OnOpenTimer_Tick(object sender, EventArgs e)
+        private void OnOpenTimer_Tick(object sender, EventArgs e) 
         {
             if (countdown == -1)
             {
-                Controls.Remove(announceLabel);
                 onOpenTimer.Stop();
                 gameTimer.Start();
                 enemyMovementTimer.Start();
                 starAnimateTimer.Start();
             }
-            if (countdown == 3) Controls.Add(announceLabel);
-            if (countdown != 0) announceLabel.Text = countdown.ToString();
-            if (countdown == 0) announceLabel.Text = "FIGHT!";
+            doCountdown("FIGHT!",3); 
             
-            countdown--;
         }
         private void BulletTimer_Tick(object sender, EventArgs e)
         {
@@ -318,7 +352,7 @@ namespace Space_Game
                 {
                     clearBullet(bullet);
                     logger.logBox.AppendText($"{getTime()} - Player hit!" + Environment.NewLine);
-                    score--;
+                    score = score <= 0 ? 0 : score - 1;
                     scoreLabel.Text = score.ToString();
 
                 }
@@ -556,7 +590,6 @@ namespace Space_Game
                 bullet.Location = new Point(currentEntityLoc.X + vehicleSize.Width / 2 - 5, currentEntityLoc.Y - vehicleSize.Height / 2 + 6);
                 bullet.BackColor = System.Drawing.Color.FromArgb(255, 255, 30, 80);
                 bullets.Add(new Tuple<PictureBox, Label>(p, bullet));
-
             }
             else
             { // Spawn bullet BELOW the entity (enemy)
@@ -565,6 +598,7 @@ namespace Space_Game
                 bullets.Add(new Tuple<PictureBox,Label>(enemy,bullet));
             }
             Controls.Add(bullet);
+            Controls.SetChildIndex(bullet, 1);
             bulletTimer.Start();
         }
 

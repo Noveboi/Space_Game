@@ -61,7 +61,6 @@
             this.playText.TabIndex = 1;
             this.playText.Text = "PLAY";
             this.playText.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.playText.FontChanged += new System.EventHandler(this.playText_FontChanged);
             this.playText.Click += new System.EventHandler(this.play_Click);
             this.playText.MouseEnter += new System.EventHandler(this.changeCursor);
             // 

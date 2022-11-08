@@ -37,9 +37,9 @@ namespace Space_Game
             game.Show();
             game.MaximizeBox = false;
             game.MinimizeBox = false;
-            if (game.Focused) { this.Hide(); }
+            if (game.Focused) Hide(); 
             //close Menu when event FormClosed is fired from the Game form
-            game.FormClosed += (s, args) => this.Close(); 
+            game.FormClosed += (s, args) => Close(); 
         }
 
         //MouseEnter event
@@ -53,9 +53,6 @@ namespace Space_Game
         {
             //Set pictureBox as background (Z-index = -1)
             Controls.SetChildIndex(pictureBox1, -1);
-
-            //Assign custom font
-
         }
 
         private void optionsText_MouseClick(object sender, MouseEventArgs e)
@@ -65,10 +62,6 @@ namespace Space_Game
             options.Size = new Size(this.Width, this.Height);
         }
 
-        private void playText_FontChanged(object sender, EventArgs e)
-        { 
-        }
-
         private void scoresText_Click(object sender, EventArgs e)
         {
             Scores scores = new Scores();
@@ -76,20 +69,4 @@ namespace Space_Game
             scores.Size = new Size(this.Width / 2, 600);
         }
     }
-    public class FontSetter
-    {
-        public void SetFont(Control parent)
-        {
-            PrivateFontCollection pfc = new PrivateFontCollection();
-            pfc.AddFontFile("EarlyGameboy.ttf");
-            foreach (var label in parent.Controls.OfType<Label>())
-            {
-                label.Font = new Font(pfc.Families[0],
-                    label.Font.Size, label.Font.Style);
-            }
-        }
-    }
-
-    
-
 }
