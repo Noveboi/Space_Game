@@ -22,7 +22,7 @@ namespace Space_Game
         #region Private Variables
         //game variables & attributes
         private int score = 0;
-        private const int gameTime = 10; //In seconds
+        private const int gameTime = 5; //In seconds
 
         private Timer gameTimer = new Timer { Interval = 1000 };
         private int elapsedSeconds = 1;
