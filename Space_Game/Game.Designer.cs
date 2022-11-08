@@ -41,9 +41,10 @@
             // 
             this.p.BackColor = System.Drawing.Color.Transparent;
             this.p.Image = ((System.Drawing.Image)(resources.GetObject("p.Image")));
-            this.p.Location = new System.Drawing.Point(565, 502);
+            this.p.Location = new System.Drawing.Point(753, 618);
+            this.p.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.p.Name = "p";
-            this.p.Size = new System.Drawing.Size(150, 167);
+            this.p.Size = new System.Drawing.Size(200, 206);
             this.p.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.p.TabIndex = 0;
             this.p.TabStop = false;
@@ -54,9 +55,10 @@
             this.timeLabel.BackColor = System.Drawing.Color.Transparent;
             this.timeLabel.Font = new System.Drawing.Font("Niagara Solid", 72F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.timeLabel.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.timeLabel.Location = new System.Drawing.Point(12, 569);
+            this.timeLabel.Location = new System.Drawing.Point(16, 700);
+            this.timeLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.timeLabel.Name = "timeLabel";
-            this.timeLabel.Size = new System.Drawing.Size(166, 103);
+            this.timeLabel.Size = new System.Drawing.Size(209, 128);
             this.timeLabel.TabIndex = 1;
             this.timeLabel.Text = "timer";
             // 
@@ -64,9 +66,10 @@
             // 
             this.enemy.BackColor = System.Drawing.Color.Transparent;
             this.enemy.Image = ((System.Drawing.Image)(resources.GetObject("enemy.Image")));
-            this.enemy.Location = new System.Drawing.Point(565, 12);
+            this.enemy.Location = new System.Drawing.Point(753, 15);
+            this.enemy.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.enemy.Name = "enemy";
-            this.enemy.Size = new System.Drawing.Size(150, 111);
+            this.enemy.Size = new System.Drawing.Size(200, 137);
             this.enemy.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.enemy.TabIndex = 2;
             this.enemy.TabStop = false;
@@ -77,24 +80,27 @@
             this.scoreLabel.BackColor = System.Drawing.Color.Transparent;
             this.scoreLabel.Font = new System.Drawing.Font("Niagara Solid", 128.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.scoreLabel.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.scoreLabel.Location = new System.Drawing.Point(1076, 489);
+            this.scoreLabel.Location = new System.Drawing.Point(1435, 602);
+            this.scoreLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.scoreLabel.Name = "scoreLabel";
-            this.scoreLabel.Size = new System.Drawing.Size(176, 183);
+            this.scoreLabel.Size = new System.Drawing.Size(219, 228);
             this.scoreLabel.TabIndex = 3;
             this.scoreLabel.Text = "SC";
             this.scoreLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // Game
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(16)))), ((int)(((byte)(16)))), ((int)(((byte)(30)))));
-            this.ClientSize = new System.Drawing.Size(1264, 681);
+            this.ClientSize = new System.Drawing.Size(1685, 838);
             this.Controls.Add(this.scoreLabel);
             this.Controls.Add(this.enemy);
             this.Controls.Add(this.timeLabel);
             this.Controls.Add(this.p);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "Game";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Game";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Game_FormClosing);
             this.Load += new System.EventHandler(this.Game_Load);

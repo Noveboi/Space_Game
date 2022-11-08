@@ -47,13 +47,7 @@ namespace Space_Game
             timeResult.Text += " " + TimeSpan.FromSeconds(gameTime).ToString(@"mm\:ss");
         }
 
-        private void backLabel_Click(object sender, EventArgs e)
-        {
-            Hide();
-            Menu menu = new Menu();
-            menu.Show();
-            menu.FormClosed += (s, args) => Close();
-        }
+        private void backLabel_Click(object sender, EventArgs e) { Close(); }
 
         private void backLabel_MouseMove(object sender, MouseEventArgs e) { backLabel.Cursor = Cursors.Hand; }
     }

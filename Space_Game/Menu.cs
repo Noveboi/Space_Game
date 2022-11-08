@@ -27,9 +27,7 @@ namespace Space_Game
             //Prevent resizing
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
-
         }
-
         private void play_Click(object sender, EventArgs e)
         {//hide Menu when PLAY is clicked
          //close Menu when Game form is closed
@@ -37,9 +35,13 @@ namespace Space_Game
             game.Show();
             game.MaximizeBox = false;
             game.MinimizeBox = false;
-            if (game.Focused) Hide(); 
-            //close Menu when event FormClosed is fired from the Game form
-            game.FormClosed += (s, args) => Close(); 
+            if (game.Focused) Hide();
+            game.FormClosed += (s, args) =>
+            {
+                if (game.resultsClosed) Show();
+                else Close();
+            };
+            
         }
 
         //MouseEnter event

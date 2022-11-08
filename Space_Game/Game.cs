@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 /* TO-DO
- * -> Add Results.cs form after the game ends and store score and date in scores.json [P1]
+ * -> Add Results.cs form after the game ends and store score and date in scores.json [P1] (Almost done)
  * -> Make Scores.cs form functional (cooperate with scores.json) [P2]
  * -> Add sounds (enemy bullet fire, player bullet fire, enemy hit, player hit, main menu select, main menu mouseEnter label) [P3]
  * -> Add background music (main menu, game) [P4]
@@ -33,6 +33,7 @@ namespace Space_Game
         private string getTime() { return TimeSpan.FromSeconds(elapsedSeconds).ToString(@"mm\:ss"); }
         private Timer onOpenTimer = new Timer { Interval = 1000 };
         private int countdown = 3;
+        public bool resultsClosed = false;
 
         //stars
         private Timer starAnimateTimer = new Timer { Interval = 40 };
@@ -82,6 +83,9 @@ namespace Space_Game
             enemyMovementTimer.Tick += EnemyMovementTimer_Tick;
             onOpenTimer.Tick += OnOpenTimer_Tick;
             starAnimateTimer.Tick += StarAnimateTimer_Tick;
+
+            Size = new Size(1280, 720);
+            //Add in future (maybe), adjustable size with locked aspect ratio of 16:9
 
             if (haveLog)
             {
@@ -298,7 +302,11 @@ namespace Space_Game
                 Results results = new Results(score,gameTime);
                 results.Show();
                 results.Focus();
-                results.FormClosed += (s,args) => Close();
+                results.FormClosed += (s, args) =>
+                {
+                    resultsClosed = true;
+                    Close();
+                };
                 Hide();
             }
             if (elapsedSeconds <= gameTime) timeLabel.Text = getTime();
