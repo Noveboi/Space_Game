@@ -18,6 +18,8 @@ namespace Space_Game
         //Passed from Game.cs
         private int finalScore;
         private int gameTime;
+        private int rawScore;
+        private double difficultyMultiplier;
 
         private string date;
 
@@ -37,7 +39,9 @@ namespace Space_Game
         public Results(int Score,int GameTime, int enemyDifficulty)
         {
             InitializeComponent();
-            finalScore = enemyDifficulty == 1 ? (int)(Score * ScoreMultiplier(Score)) : (int)(Score * ScoreMultiplier(Score) * 1.5);
+            rawScore = Score;
+            difficultyMultiplier = enemyDifficulty == 1 ? 1 : 1.5;
+            finalScore = (int)(Score * ScoreMultiplier(GameTime) * difficultyMultiplier); ;
             gameTime = GameTime;
 
             MaximizeBox = false;
@@ -58,7 +62,7 @@ namespace Space_Game
             rankingResult.Parent = pictureBox1;
             backLabel.Parent = pictureBox1;
 
-            scoreResult.Text += " " + finalScore.ToString();
+            scoreResult.Text += $" {finalScore} ({rawScore} x {Math.Round(ScoreMultiplier(gameTime),2)} x {difficultyMultiplier}) ";
             timeResult.Text += " " + TimeSpan.FromSeconds(gameTime).ToString(@"mm\:ss");
 
             saveData();
@@ -69,7 +73,6 @@ namespace Space_Game
         private void backLabel_MouseMove(object sender, MouseEventArgs e) { backLabel.Cursor = Cursors.Hand; }
 
         #region JSON Methods
-
 
         private void saveData()
         {

@@ -34,6 +34,8 @@ namespace Space_Game
         private Timer onOpenTimer = new Timer { Interval = 1000 };
         private int countdown = 3;
         public bool resultsClosed = false;
+        private bool gamePaused = false;
+        private bool hasBegun = false;
 
         //stars
         private Timer starAnimateTimer = new Timer { Interval = 40 };
@@ -140,6 +142,7 @@ namespace Space_Game
             enemyMovementTimer.Stop();
             gameTimer.Stop();
             starAnimateTimer.Stop();
+            gamePaused = true;
         }
         void UnpauseGame()
         {
@@ -147,6 +150,7 @@ namespace Space_Game
             enemyMovementTimer.Start();
             gameTimer.Start();
             starAnimateTimer.Start();
+            gamePaused = false;
         }
 
         #region Star Creation
@@ -194,6 +198,7 @@ namespace Space_Game
             Controls.SetChildIndex(scoreLabel, -1);
             CreateStars(30,0);
             Focus();
+            Cursor.Hide();
 
             onOpenTimer.Start();
 
@@ -204,7 +209,7 @@ namespace Space_Game
         {
             if (e.CloseReason == CloseReason.UserClosing && elapsedSeconds <= gameTime)
             {
-                MessageBox.Show("Are you sure you want to exit? If yes, this run will not be recorded.", "Woah!", MessageBoxButtons.YesNo);
+                MessageBox.Show("This match will not be recorded.", "Are you sure?", MessageBoxButtons.YesNo);
             }
         }
         #endregion
@@ -331,6 +336,7 @@ namespace Space_Game
                 gameTimer.Start();
                 enemyMovementTimer.Start();
                 starAnimateTimer.Start();
+                hasBegun = true;
             }
             doCountdown("FIGHT!",3); 
             
@@ -413,28 +419,30 @@ namespace Space_Game
                         break;
                 }
             }
-            if (e.KeyCode == Keys.Escape)
+            if (e.KeyCode == Keys.Escape && hasBegun)
             {
                 if (gameRunning) 
                 {
                     PauseGame();
                     announceLabel.Text = "GAME PAUSED";
                     Controls.Add(announceLabel);
+                    Cursor.Show();
                 }
                 else
                 {
+                    Cursor.Hide();
                     UnpauseGame();
                     Controls.Remove(announceLabel);
-
                 };  
             }
             if (e.KeyCode == Keys.P)
             {
-                if (!logger.Visible) logger.Show();
-                else logger.Hide();
+                if (!logger.Visible) { logger.Show(); Cursor.Show(); }
+                else { logger.Hide(); Cursor.Hide(); };
                 if (gameRunning && firstOpen) { Focus(); firstOpen = false; }
                 if(gameRunning && !firstOpen) logger.Show(); 
             }
+            if (e.KeyCode == Keys.E && gamePaused) Close();
 
             PlayerMove();
             playerMovementTimer.Start();
