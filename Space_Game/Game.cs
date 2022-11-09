@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 /* TO-DO
+ * -> Create algorithm to calculate score based on raw score, game time, and enemy difficulty [P1]
+ * -> Add more options in Options.cs, like choose bullet color, choose game time, choose enemy difficulty [P2]
  * -> Add sounds (enemy bullet fire, player bullet fire, enemy hit, player hit, main menu select, main menu mouseEnter label) [P3]
  * -> Add background music (main menu, game) [P4]
  */
@@ -20,7 +22,7 @@ namespace Space_Game
         #region Private Variables
         //game variables & attributes
         private int score = 0;
-        private const int gameTime = 5; //In seconds
+        private const int gameTime = 120; //In seconds
 
         private Timer gameTimer = new Timer { Interval = 1000 };
         private int elapsedSeconds = 1;
