@@ -13,13 +13,15 @@ namespace Space_Game
 {
     public partial class Logger : Form
     {
-        public Logger()
+        Game gameRef;
+        public Logger(Game Game)
         {
+            gameRef = Game;
             InitializeComponent();
             resizeBoxes();
             label1.Location = new Point(label1.Location.X, posBox.Height + 30);
             label2.Location = new Point(label1.Location.X, posBox.Height + label1.Height + 10);
-
+            Focus();
         }
 
         private void Logger_FormClosing(object sender, FormClosingEventArgs e)
@@ -53,6 +55,27 @@ namespace Space_Game
             logBox.Size = new Size((int)(Width / proportions), height);
             moveBox.Size = new Size((int)(Width / proportions), height);
             posBox.Size = new Size((int)((proportions - 2) * Width / proportions) - 40, height);
+        }
+
+        private void Logger_Load(object sender, EventArgs e)
+        {
+            Focus();
+            foreach (var tb in Controls.OfType<TextBox>()) { tb.MouseClick += ClickBox; }
+        }
+
+        private void Logger_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar.ToString().ToLower() == "p") { Hide(); gameRef.Focus(); }
+        }
+
+        private void ClickBox(object sender, EventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+        }
+
+        private void Logger_Activated(object sender, EventArgs e)
+        {
+            foreach (var tb in Controls.OfType<TextBox>()) tb.Enabled = true;
         }
     }
 }

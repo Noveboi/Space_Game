@@ -23,6 +23,7 @@ namespace Space_Game
         //game variables & attributes
         private int score = 0;
         private const int gameTime = 60; //In seconds
+        private int enemyDifficulty = 2; // 1 - ok | 2 - hard
 
         private Timer gameTimer = new Timer { Interval = 1000 };
         private int elapsedSeconds = 1;
@@ -55,7 +56,8 @@ namespace Space_Game
         private Keys kdk = Keys.None;
             
         private Timer enemyMovementTimer = new Timer { Interval = 50 };
-        private double sweepProbability = 0.005;
+        private double sweepProbability = 0;
+        //private double sweepProbability = 0.005;
 
         private int wait = 0;
         private const int waitTickAmt = 7;
@@ -69,8 +71,17 @@ namespace Space_Game
 
         //debugging
         private bool haveLog = true;
+        private bool firstOpen = true;
         Logger logger;
 
+        #endregion
+
+        #region Math
+        double CubeRoot(double num)
+        {
+            if (num < 0) return -Math.Pow(-num, 1d / 3d);
+            else return Math.Pow(num, 1d / 3d);
+        }
         #endregion
 
         #region Game Methods and Events
@@ -84,12 +95,15 @@ namespace Space_Game
             onOpenTimer.Tick += OnOpenTimer_Tick;
             starAnimateTimer.Tick += StarAnimateTimer_Tick;
 
+
+            if (enemyDifficulty == 2) enemyMovementTimer.Interval = 40;
+
             Size = new Size(1280, 720);
             //Add in future (maybe), adjustable size with locked aspect ratio of 16:9
 
             if (haveLog)
             {
-                logger = new Logger();
+                logger = new Logger(this);
                 logger.logBox.Text = "";
                 logger.posBox.Text = "";
                 logger.moveBox.Text = "";
@@ -129,6 +143,14 @@ namespace Space_Game
             gameTimer.Stop();
             starAnimateTimer.Stop();
         }
+        void UnpauseGame()
+        {
+            bulletTimer.Start();
+            enemyMovementTimer.Start();
+            gameTimer.Start();
+            starAnimateTimer.Start();
+        }
+
         #region Star Creation
         Color randomBrightness()
         {
@@ -173,7 +195,6 @@ namespace Space_Game
         }
         void CreateStars(int amount, int yOffset)
         {
-            logger.logBox.AppendText($"{amount} stars created with y-offset {yOffset}");
             for (int i = 0; i < amount; i++)
             {
                 Label star = new Label();
@@ -238,12 +259,12 @@ namespace Space_Game
             logger.posBox.AppendText($"{time} - Enemy: {enemy.Location} {Environment.NewLine}            " +
                 $"Player: {p.Location} {Environment.NewLine}");
 
-            int maxRand = (int)(1/sweepProbability);
+            int maxRand = sweepProbability != 0 ? (int)(1/sweepProbability) : 400;
             //Random decision
             int dec = RandomNumberGenerator.Create().GetHashCode() % (maxRand + 1);
 
             //Condition to begin sweep
-            if (dec == maxRand && !startSweep) startSweep = true;
+            if (dec == maxRand && !startSweep && sweepProbability != 0) startSweep = true;
             #region Sweep Movement 
             if (startSweep) {
                 //Determine ONCE if enemy is moreLeft
@@ -405,27 +426,25 @@ namespace Space_Game
             }
             if (e.KeyCode == Keys.Escape)
             {
-                if (gameRunning) //Pause
+                if (gameRunning) 
                 {
                     PauseGame();
-
                     announceLabel.Text = "GAME PAUSED";
                     Controls.Add(announceLabel);
                 }
-                else //Unpause
+                else
                 {
-                    gameTimer.Start();
-                    enemyMovementTimer.Start();
-                    bulletTimer.Start();
-
+                    UnpauseGame();
                     Controls.Remove(announceLabel);
 
                 };  
             }
             if (e.KeyCode == Keys.P)
             {
-                logger.Show();
-                if (gameRunning) Focus();
+                if (!logger.Visible) logger.Show();
+                else logger.Hide();
+                if (gameRunning && firstOpen) { Focus(); firstOpen = false; }
+                if(gameRunning && !firstOpen) logger.Show(); 
             }
 
             PlayerMove();
@@ -476,7 +495,7 @@ namespace Space_Game
         }
         void MoveLeft(PictureBox p)
         {
-            if (p.Location.X > 10)
+            if (p.Location.X > 40)
             { p.Location = new Point(p.Location.X - vehicleSpeed, p.Location.Y); }
         }
         void MoveDown(PictureBox p)
@@ -486,21 +505,27 @@ namespace Space_Game
         }
         void MoveRight(PictureBox p)
         {
-            if (p.Location.X < Width - (vehicleSize.Width + vehicleSpeed + 10))
+            if (p.Location.X < Width - (vehicleSize.Width + vehicleSpeed + 40))
             { p.Location = new Point(p.Location.X + vehicleSpeed, p.Location.Y); }
         }
 
         //Overload left and right for enemy
         void MoveLeft(PictureBox p, double moveScalar)
         {
-            if (p.Location.X > 10)
-            { p.Location = new Point(p.Location.X - (int)(vehicleSpeed * moveScalar), p.Location.Y); }
+            if (p.Location.X > 40)
+            { 
+                p.Location = new Point(p.Location.X - (int)(vehicleSpeed * moveScalar), p.Location.Y);
+                logger.logBox.AppendText($"Move Left ({-(int)(vehicleSpeed * moveScalar)}px)"+Environment.NewLine);
+            }
         }
 
         void MoveRight(PictureBox p, double moveScalar)
         {
-            if (p.Location.X < Width - (vehicleSize.Width + vehicleSpeed + 10))
-            { p.Location = new Point(p.Location.X + (int)(vehicleSpeed * moveScalar), p.Location.Y); }
+            if (p.Location.X < Width - (vehicleSize.Width + vehicleSpeed + 40))
+            { 
+                p.Location = new Point(p.Location.X + (int)(vehicleSpeed * moveScalar), p.Location.Y);
+                logger.logBox.AppendText($"Move Right ({(int)(vehicleSpeed * moveScalar)}px)"+Environment.NewLine);
+            }
         }
 
         void PlayerMove()
@@ -524,17 +549,62 @@ namespace Space_Game
             int move = RandomNumberGenerator.Create().GetHashCode()%3;
             if (move == 0)
             {
-                //Chance to move up to 2 times more (takes values from 1 to 2)
-                int moveDirection = RandomNumberGenerator.Create().GetHashCode() % 50;
-                double moveWeight = (double)enemy.Location.X / (double)Width * 3 + 2;
+                //Read WeightedMove() summary for more details on these 2 variables
+                int directionDecision = RandomNumberGenerator.Create().GetHashCode() % 50;
+                double moveWeight = (double)enemy.Location.X / (double)Width * 2 + 2;
 
-                if (moveDirection >= 0 && moveDirection < 25) MoveLeft(enemy, moveWeight);
-                if (moveDirection >= 25 && moveDirection <= 50) MoveRight(enemy, 6-moveWeight);
+                if(enemyDifficulty == 1) WeightedMove(moveWeight, 0, directionDecision); 
+                if(enemyDifficulty == 2)
+                {
+                    //posDifference < 0: enemy is to the right of the player (enemy.X < p.X)
+                    //posDifference > 0: enemy is to the left of the player (enemy.X > p.X)
+                    int posDifference = enemy.Location.X - p.Location.X;
+                    //convert posDifference into the direction weight to be passed to WeightedMove()
+                    double directionWeight = (double)posDifference / Width;
+
+                    logger.logBox.AppendText($"pD: {posDifference} | dW: {directionWeight}");
+
+                    WeightedMove(moveWeight, directionWeight, directionDecision);
+                }
+
                 logger.moveBox.AppendText($"Move Sporadic!" + Environment.NewLine);
-
-            } else
+            } 
+            else
             {
                 logger.moveBox.AppendText("No Move!" + Environment.NewLine);
+            }
+        }
+
+        /// <summary>
+        /// Generally used for both enemyDifficulties. For difficulty = 1, directionWeight remains constant at 1,
+        /// otherwise, directionWeight is shifted according to relative player and enemy locations.
+        /// </summary>
+        /// <param name="moveWeight">Varies the "speed" of each movement</param>
+        /// <param name="directionWeight">
+        /// This is a function of posDifference (posDifference divided by Width).
+        /// it provides info about which direction to move and how fast to do so. (set to 0 for random movements)
+        /// -------
+        /// -1: MoveRight() 49/50 times, 
+        /// from -1 to 0: MoveRight() more often, 
+        /// 0: equal probability of MoveRight() and MoveLeft(), 
+        /// from 0 to 1: MoveLeft() more often,
+        /// 1: MoveLeft() 49/50 times.
+        /// </param>
+        /// <param name="directionDecision">Decision making variable taking values from 0 to 50</param>
+        void WeightedMove(double moveWeight, double directionWeight, int directionDecision)
+        {
+            double finalWeight = 25 + 24 * CubeRoot(directionWeight); //takes values from 1 to 49 (both ends inclusive)
+            logger.logBox.AppendText($" | fW = {finalWeight}"+Environment.NewLine);
+            if (directionDecision >= 0 && directionDecision < finalWeight && enemyDifficulty == 1) MoveLeft(enemy, moveWeight);
+            if (directionDecision >= finalWeight && directionDecision <= 50 && enemyDifficulty == 1) MoveRight(enemy, 6 - moveWeight);
+
+            if (directionDecision >= 0 && directionDecision < finalWeight && enemyDifficulty == 2)
+            {
+                MoveLeft(enemy, moveWeight * Math.Abs(directionWeight*5) + 1);
+            }
+            if (directionDecision >= finalWeight && directionDecision <= 50 && enemyDifficulty == 2)
+            {
+                MoveRight(enemy, (6 - moveWeight)* Math.Abs(directionWeight*5) + 1);
             }
         }
         /// <summary>
@@ -553,7 +623,7 @@ namespace Space_Game
         {
             //for state 1
             bool reachedLeft = enemy.Location.X <= enemy.Width / 2;
-            bool reachedRight = enemy.Location.X >= Width - enemy.Width - 40;
+            bool reachedRight = enemy.Location.X >= Width - enemy.Width - 70;
 
             if (moreLeft && !sweep)
             {
