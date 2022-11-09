@@ -25,11 +25,19 @@ namespace Space_Game
         {
             InitializeComponent();
         }
+
+        //This is a cubic-linear composite function of gameTime, where for gameTime = 60, ScoreMultiplier = 1 and for gameTime = 30, scoreMultiplier ~= 0.5
+        //After gameTime = 60, the function turns linear 
+        //Check the scoreMultiplier.gif animation in the Details folder to see how the 6.21 in the division was approximated
+        private double ScoreMultiplier(int gametime)
+        {
+            return gameTime <= 60 ? new MyMath().CubeRoot(gametime - 60) / 6.21  + 1 : (gameTime - 60)/239 + 1;
+        }
         
-        public Results(int Score,int GameTime)
+        public Results(int Score,int GameTime, int enemyDifficulty)
         {
             InitializeComponent();
-            finalScore = Score;
+            finalScore = enemyDifficulty == 1 ? (int)(Score * ScoreMultiplier(Score)) : (int)(Score * ScoreMultiplier(Score) * 1.5);
             gameTime = GameTime;
 
             MaximizeBox = false;

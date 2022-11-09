@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 /* TO-DO
- * -> Create algorithm to calculate score based on raw score, game time, and enemy difficulty [P1]
  * -> Add more options in Options.cs, like choose bullet color, choose game time, choose enemy difficulty [P2]
  * -> Add sounds (enemy bullet fire, player bullet fire, enemy hit, player hit, main menu select, main menu mouseEnter label) [P3]
  * -> Add background music (main menu, game) [P4]
@@ -74,14 +73,6 @@ namespace Space_Game
         private bool firstOpen = true;
         Logger logger;
 
-        #endregion
-
-        #region Math
-        double CubeRoot(double num)
-        {
-            if (num < 0) return -Math.Pow(-num, 1d / 3d);
-            else return Math.Pow(num, 1d / 3d);
-        }
         #endregion
 
         #region Game Methods and Events
@@ -317,7 +308,7 @@ namespace Space_Game
             if(elapsedSeconds > gameTime + 2)
             {
                 gameTimer.Stop();
-                Results results = new Results(score,gameTime);
+                Results results = new Results(score,gameTime,enemyDifficulty);
                 results.Show();
                 results.Focus();
                 results.FormClosed += (s, args) =>
@@ -614,7 +605,7 @@ namespace Space_Game
             //
             // -> In the Details folder of this project you can see the graphs of both a linear finalWeight function and
             //    a cubic one, along with some calculated values so you can clearly see the difference!
-            double finalWeight = 25 + 24 * CubeRoot(directionWeight); //takes values from 1 to 49 (both ends inclusive)
+            double finalWeight = 25 + 24 *(new MyMath().CubeRoot(directionWeight)); //takes values from 1 to 49 (both ends inclusive)
 
             //logger.logBox.AppendText($" | fW = {finalWeight}"+Environment.NewLine);
             //for enemyDifficulty == 1, move around randomly
