@@ -417,8 +417,8 @@ namespace Space_Game
                     //Fire a bullet
                     case Keys.Space:
                         SpawnBullet(p.Location);
-                        logger.logBox.AppendText($"{getTime()} - Bullet Fired at " +
-                            $"{new Point(p.Location.X + vehicleSize.Width / 2 - 5,p.Location.Y)}{Environment.NewLine}");
+                        //logger.logBox.AppendText($"{getTime()} - Bullet Fired at " +
+                        //    $"{new Point(p.Location.X + vehicleSize.Width / 2 - 5,p.Location.Y)}{Environment.NewLine}");
                         break;
                 }
             }
@@ -513,7 +513,7 @@ namespace Space_Game
             if (p.Location.X > 40)
             { 
                 p.Location = new Point(p.Location.X - (int)(vehicleSpeed * moveScalar), p.Location.Y);
-                logger.logBox.AppendText($"Move Left ({-(int)(vehicleSpeed * moveScalar)}px)"+Environment.NewLine);
+                //logger.logBox.AppendText($"Move Left ({-(int)(vehicleSpeed * moveScalar)}px)"+Environment.NewLine);
             }
         }
 
@@ -522,7 +522,7 @@ namespace Space_Game
             if (p.Location.X < Width - (vehicleSize.Width + vehicleSpeed + 40))
             { 
                 p.Location = new Point(p.Location.X + (int)(vehicleSpeed * moveScalar), p.Location.Y);
-                logger.logBox.AppendText($"Move Right ({(int)(vehicleSpeed * moveScalar)}px)"+Environment.NewLine);
+                //logger.logBox.AppendText($"Move Right ({(int)(vehicleSpeed * moveScalar)}px)"+Environment.NewLine);
             }
         }
 
@@ -549,6 +549,7 @@ namespace Space_Game
         void enemyMove_Sporadic()
         {
             int move = RandomNumberGenerator.Create().GetHashCode()%3;
+            WatchForBullets();
             if (move == 0)
             {
                 //Read WeightedMove() summary for more details on these 2 variables
@@ -564,7 +565,7 @@ namespace Space_Game
                     //convert posDifference into the direction weight to be passed to WeightedMove()
                     double directionWeight = (double)posDifference / Width;
 
-                    logger.logBox.AppendText($"pD: {posDifference} | dW: {directionWeight}");
+                    //logger.logBox.AppendText($"pD: {posDifference} | dW: {directionWeight}");
 
                     WeightedMove(moveWeight, directionWeight, directionDecision);
                 }
@@ -615,7 +616,7 @@ namespace Space_Game
             //    a cubic one, along with some calculated values so you can clearly see the difference!
             double finalWeight = 25 + 24 * CubeRoot(directionWeight); //takes values from 1 to 49 (both ends inclusive)
 
-            logger.logBox.AppendText($" | fW = {finalWeight}"+Environment.NewLine);
+            //logger.logBox.AppendText($" | fW = {finalWeight}"+Environment.NewLine);
             //for enemyDifficulty == 1, move around randomly
             if (directionDecision >= 0 && directionDecision < finalWeight && enemyDifficulty == 1) MoveLeft(enemy, moveWeight);
             //for enemyDifficulty == 2, follow player and continue moving sporadically while doing so.
@@ -634,6 +635,33 @@ namespace Space_Game
                 MoveRight(enemy, (6 - moveWeight)* Math.Abs(directionWeight*5) + 1);
             }
         }
+
+        /// <summary>
+        /// Mechanism that enables the enemy to dodge incoming bullets
+        /// </summary>
+        void WatchForBullets()
+        {
+            foreach(var bullet in bullets.ToList())
+            {
+                //execute code only if bullet fired belongs to player
+                if (bullet.Item1 == p)
+                {
+                    //bullet is to the right of the enemy
+
+                    bool bulletCloseToEnemyRight = (bullet.Item2.Location.X + bullet.Item2.Width/2) - (enemy.Location.X + enemy.Width/2) < 140 
+                        && (bullet.Item2.Location.X + bullet.Item2.Width / 2) - (enemy.Location.X + enemy.Width / 2) >= 0
+                        && Math.Abs(bullet.Item2.Location.Y - (enemy.Location.Y + enemy.Height)) < bulletSpeed * 3;
+                    //bullet is to the left of the enemy
+                    bool bulletCloseToEnemyLeft = (bullet.Item2.Location.X + bullet.Item2.Width / 2) - (enemy.Location.X + enemy.Width / 2) > -140
+                        && (bullet.Item2.Location.X + bullet.Item2.Width / 2) - (enemy.Location.X + enemy.Width / 2)  <= 0
+                        && Math.Abs(bullet.Item2.Location.Y - (enemy.Location.Y + enemy.Height)) < bulletSpeed * 3;
+
+                    if (bulletCloseToEnemyRight) { MoveLeft(enemy, 2); logger.logBox.AppendText($"Bullet to the right! {(bullet.Item2.Location.X + bullet.Item2.Width / 2) - (enemy.Location.X + enemy.Width / 2)}"+Environment.NewLine); }
+                    if (bulletCloseToEnemyLeft) { MoveRight(enemy, 2); logger.logBox.AppendText($"Bullet to the left! {(bullet.Item2.Location.X + bullet.Item2.Width / 2) - (enemy.Location.X + enemy.Width / 2)}"+Environment.NewLine); }
+                }
+            }
+        }
+
         /// <summary>
         /// Enemy goes to one end of the window (left or right, whichever they're closest to) and 
         /// goes from that end to the other while firing bullets rapidly
