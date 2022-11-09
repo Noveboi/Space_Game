@@ -21,7 +21,7 @@ namespace Space_Game
         #region Private Variables
         //game variables & attributes
         private int score = 0;
-        private const int gameTime = 60; //In seconds
+        private const int gameTime = 20; //In seconds
         private int enemyDifficulty = 2; // 1 - ok | 2 - hard
 
         private Timer gameTimer = new Timer { Interval = 1000 };
@@ -57,7 +57,7 @@ namespace Space_Game
         private Keys kdk = Keys.None;
             
         private Timer enemyMovementTimer = new Timer { Interval = 50 };
-        private double sweepProbability = 0;
+        private double sweepProbability = 0.005;
         //private double sweepProbability = 0.005;
 
         private int wait = 0;
@@ -78,6 +78,7 @@ namespace Space_Game
         #endregion
 
         #region Game Methods and Events
+        private void Game_Deactivate(object sender, EventArgs e) { Cursor.Show(); }
         public Game()
         {
             InitializeComponent();

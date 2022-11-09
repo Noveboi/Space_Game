@@ -75,16 +75,10 @@ namespace Space_Game
             dLabel.Parent = bg;
         }
 
-        private static int compareScore(DateScore ds1, DateScore ds2)
-        {
-            return ds1.score.CompareTo(ds2.score);
-        }
-
         private void Scores_Load(object sender, EventArgs e)
         {
             ScoreData scoreData = new ScoreData().GetJson();
-            List<DateScore> dateScore = scoreData.ConvertToList();
-            dateScore.Sort(compareScore);
+            List<DateScore> dateScore = scoreData.SortScores();
             dateScore.Reverse();
             if (dateScore.Count >= 10) for (int i = 0; i < 10; i++) { createDateScoreCols(dateScore[i], i); }
             else for (int i = 0; i < dateScore.Count; i++) { createDateScoreCols(dateScore[i], i); }

@@ -52,6 +52,8 @@ namespace Space_Game
 
         private void Results_Load(object sender, EventArgs e)
         {
+            saveData();
+
             pictureBox1.Size = new Size(Width, Height);
             pictureBox1.Location = new Point(0, 0);
             Controls.SetChildIndex(pictureBox1, -1);
@@ -64,8 +66,7 @@ namespace Space_Game
 
             scoreResult.Text += $" {finalScore} ({rawScore} x {Math.Round(ScoreMultiplier(gameTime),2)} x {difficultyMultiplier}) ";
             timeResult.Text += " " + TimeSpan.FromSeconds(gameTime).ToString(@"mm\:ss");
-
-            saveData();
+            rankingResult.Text = showRanking();
         }
 
         private void backLabel_Click(object sender, EventArgs e) { Close(); }
@@ -74,6 +75,21 @@ namespace Space_Game
 
         #region JSON Methods
 
+        private string showRanking()
+        {
+            ScoreData scoreData = new ScoreData().GetJson();
+            List<DateScore> sortedData = scoreData.SortScores();
+            int ranking = 0;
+            for (int i = 0; i < sortedData.Count; i++)
+            {
+                if (sortedData[i].date == date) ranking = i;
+            }
+            if (ranking.ToString().EndsWith("1") && ranking != 11) return $"You placed {ranking}st in your score rankings!";
+            else if (ranking.ToString().EndsWith("2") && ranking != 12) return $"You placed {ranking}nd in your score rankings!";
+            else if (ranking.ToString().EndsWith("3") && ranking != 13) return $"You placed {ranking}rd in your score rankings!";
+            else if (ranking >= 10 && ranking < 20) return $"You placed {ranking}th in your score rankings!";
+            else return $"You placed {ranking}th in your score rankings!";
+        }
         private void saveData()
         {
             //scoreData contains all of the JSON info in a simple ScoreData object

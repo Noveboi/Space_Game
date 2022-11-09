@@ -42,7 +42,7 @@
             this.p.BackColor = System.Drawing.Color.Transparent;
             this.p.Image = ((System.Drawing.Image)(resources.GetObject("p.Image")));
             this.p.Location = new System.Drawing.Point(753, 618);
-            this.p.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.p.Margin = new System.Windows.Forms.Padding(4);
             this.p.Name = "p";
             this.p.Size = new System.Drawing.Size(200, 206);
             this.p.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -67,7 +67,7 @@
             this.enemy.BackColor = System.Drawing.Color.Transparent;
             this.enemy.Image = ((System.Drawing.Image)(resources.GetObject("enemy.Image")));
             this.enemy.Location = new System.Drawing.Point(753, 15);
-            this.enemy.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.enemy.Margin = new System.Windows.Forms.Padding(4);
             this.enemy.Name = "enemy";
             this.enemy.Size = new System.Drawing.Size(200, 137);
             this.enemy.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -98,10 +98,11 @@
             this.Controls.Add(this.enemy);
             this.Controls.Add(this.timeLabel);
             this.Controls.Add(this.p);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Game";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Game";
+            this.Deactivate += new System.EventHandler(this.Game_Deactivate);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Game_FormClosing);
             this.Load += new System.EventHandler(this.Game_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Game_KeyDown);

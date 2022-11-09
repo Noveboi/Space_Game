@@ -33,7 +33,7 @@ namespace Space_Game
             return JsonSerializer.Deserialize<ScoreData>(rawJsonText);
         }
 
-        public List<DateScore> ConvertToList()
+        public List<DateScore> ToList()
         {
             List<DateScore> list = new List<DateScore>();
             for (int i = 0; i < scores.Count; i++)
@@ -45,6 +45,18 @@ namespace Space_Game
                 };
                 list.Add(dateScore);
             }
+            return list;
+        }
+
+        private static int compareScore(DateScore ds1, DateScore ds2)
+        {
+            return ds1.score.CompareTo(ds2.score);
+        }
+
+        public List<DateScore> SortScores()
+        {
+            var list = ToList();
+            list.Sort(compareScore);
             return list;
         }
 
