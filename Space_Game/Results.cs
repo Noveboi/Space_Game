@@ -61,18 +61,17 @@ namespace Space_Game
         private void backLabel_MouseMove(object sender, MouseEventArgs e) { backLabel.Cursor = Cursors.Hand; }
 
         #region JSON Methods
-        private ScoreData getJson()
-        {
-            string rawJsonText = File.ReadAllText("../../scores.json");
-            return JsonSerializer.Deserialize<ScoreData>(rawJsonText);
-        }
+
 
         private void saveData()
         {
             //scoreData contains all of the JSON info in a simple ScoreData object
-            ScoreData scoreData = getJson();
+            ScoreData scoreData = new ScoreData().GetJson();
+
             int scoreAmt = scoreData.scores.Count;
+            
             scoreData.AppendLatestScores($"score{scoreAmt + 1}", finalScore, $"date{scoreAmt + 1}", date);
+
             string outJson = JsonSerializer.Serialize(scoreData);
             File.WriteAllText("../../scores.json",outJson);
         }

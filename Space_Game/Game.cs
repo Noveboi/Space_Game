@@ -10,8 +10,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 /* TO-DO
- * -> Add Results.cs form after the game ends and store score and date in scores.json [P1] (Almost done)
- * -> Make Scores.cs form functional (cooperate with scores.json) [P2]
  * -> Add sounds (enemy bullet fire, player bullet fire, enemy hit, player hit, main menu select, main menu mouseEnter label) [P3]
  * -> Add background music (main menu, game) [P4]
  */
