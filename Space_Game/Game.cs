@@ -112,6 +112,11 @@ namespace Space_Game
             announceLabel.Size = new Size(Width + 20, Height - 50);
         }
 
+        /// <summary>
+        /// Do a simple countdown and print the corresponding announceText through the announceLabel
+        /// </summary>
+        /// <param name="annouceText">Text to be displayed after countdown ends</param>
+        /// <param name="countFrom">Number to count down from</param>
         private void doCountdown(string annouceText, int countFrom)
         {
             if (countdown == -1)
@@ -128,7 +133,9 @@ namespace Space_Game
 
             countdown--;
         }
-
+        /// <summary>
+        /// Simple 3,2,1 countdown without announceText
+        /// </summary>
         private void doCountdown()
         {
             if (countdown == -1) { Controls.Remove(announceLabel); }
@@ -157,41 +164,17 @@ namespace Space_Game
             int b = (RandomNumberGenerator.Create().GetHashCode() % 55) + 200;
             return Color.FromArgb(255, b, b, b);
         }
-
-        Point randomLocation()
-        {
-            int x = RandomNumberGenerator.Create().GetHashCode() % Width;
-            int y = RandomNumberGenerator.Create().GetHashCode() % Height;
-            return new Point(x, y);
-        }
         Point randomLocation(int yOffset)
         {
             int x = RandomNumberGenerator.Create().GetHashCode() % Width;
             int y = RandomNumberGenerator.Create().GetHashCode() % Height;
-            y += yOffset;
-            return new Point(x, y);
+            return new Point(x, y + yOffset);
         }
 
         Size randomSize()
         {
             int s = (RandomNumberGenerator.Create().GetHashCode() % 3) + 3;
             return new Size(s, s);
-        }
-
-        void CreateStars(int amount)
-        {
-            for (int i = 0; i < amount; i++)
-            {
-                Label star = new Label();
-                star.AutoSize = false;
-                star.Size = randomSize();
-                star.Text = null;
-                star.BackColor = randomBrightness();
-                star.Location = randomLocation();
-                stars.Add(new Tuple<Label,int>(star, (RandomNumberGenerator.Create().GetHashCode() % 6) + 3));
-                Controls.Add(star);
-                Controls.SetChildIndex(star, -1);
-            }
         }
         void CreateStars(int amount, int yOffset)
         {
@@ -218,7 +201,7 @@ namespace Space_Game
 
             Controls.SetChildIndex(timeLabel, -1);
             Controls.SetChildIndex(scoreLabel, -1);
-            CreateStars(30);
+            CreateStars(30,0);
             Focus();
 
             onOpenTimer.Start();
@@ -236,9 +219,15 @@ namespace Space_Game
         #endregion
 
         #region Timers
+        /// <summary>
+        /// Every star label is translated a certain Y amount for each timer tick
+        /// </summary>
         private void StarAnimateTimer_Tick(object sender, EventArgs e)
         {
-            if (counter == 50) CreateStars(25,Height);
+            //every 50th counter tick, create new stars that spawn from the non-visible bottom part of the window
+            //this is to maintain a certain amount of stars flying in the background
+            if (counter == 50) CreateStars(25,Height); 
+
             logger.label1.Text = $"Exising stars: {stars.Count}";
             foreach (var star in stars.ToList())
             {
@@ -249,7 +238,7 @@ namespace Space_Game
                     stars.Remove(star);
                 }
             }
-            //(% n) = reset every n ticks
+            //(% n) = reset counter every n ticks
             counter = (counter + 1) % 150;
             
         }
@@ -301,22 +290,30 @@ namespace Space_Game
                 }
             }
         }
+        /// <summary>
+        /// Keeps time of seconds passed since Game start, end is responsible for ending the game once 
+        /// the specificied amount of gameTime has passed
+        /// </summary>
         private void GameTimer_Tick(object sender, EventArgs e)
         {
-            if(elapsedSeconds >= gameTime - 3 && elapsedSeconds <= gameTime - 1)
+            //Start countdown 3 seconds before GAME OVER
+            if(elapsedSeconds >= gameTime - 3 && elapsedSeconds <= gameTime - 1) 
             {
                 if (elapsedSeconds == gameTime - 3) countdown = 3;
                 doCountdown();
             }
 
-            if (elapsedSeconds > gameTime - 1) 
+            //Pause the game and strip all control from the player
+            if (elapsedSeconds > gameTime - 1)
             {
                 PauseGame();
                 gameTimer.Start();
                 ClearAllBullets(bullets);
                 announceLabel.Text = "GAME OVER!";
-                Controls.Add(announceLabel); 
+                Controls.Add(announceLabel);
             }
+
+            //Hide the game form and show the results of the match
             if(elapsedSeconds > gameTime + 2)
             {
                 gameTimer.Stop();
@@ -336,6 +333,7 @@ namespace Space_Game
         }
         private void OnOpenTimer_Tick(object sender, EventArgs e) 
         {
+            //Begin timers and initiate countdown to begin the match
             if (countdown == -1)
             {
                 onOpenTimer.Stop();
@@ -486,7 +484,7 @@ namespace Space_Game
         //Player movement system inspired by: https://stackoverflow.com/a/29957353
         #region Player Movement Methods
 
-        private int yReduction = 10;
+        private int yReduction = 10; //reduce the y amount traversed each tick
 
         void MoveUp(PictureBox p)
         {
@@ -528,6 +526,10 @@ namespace Space_Game
             }
         }
 
+        /// <summary>
+        /// Move the pictureBox according to movement bool values
+        /// </summary>
+        //This is where the movement actually occurs
         void PlayerMove()
         {
             if (mu) MoveUp(p);
@@ -593,11 +595,36 @@ namespace Space_Game
         /// <param name="directionDecision">Decision making variable taking values from 0 to 50</param>
         void WeightedMove(double moveWeight, double directionWeight, int directionDecision)
         {
+            //finalWeight is a function of directionWeight which is a function of posDifference, therefore
+            //finalWeight is a fucntion of posDifference.
+            //it influences enemy movement to guide enemy towards the player's position
+            //The reasoning for its definition (formula):
+            // -> 25 (constant): this is here to act as a "middle ground" between values 0 and 50
+            //    since directionWeight takes values from -1 to 1.
+            // -> 24 * CubeRoot(directionWeight): this seems convoluted but is very simple in terms of 
+            //    its functionality: 24 * directionWeight gives finalWeight its range [0,50], but 
+            //    24 * directionWeight is a linear function and it negatively impacts the enemy's decision making 
+            //    in terms of whether to MoveRight or MoveLeft. The negative impact is that the enemy will tend to
+            //    'hover' AROUND the player but not go ABOVE the player, which leads to the enemy missing constantly
+            //    This happens because for relatively high values of posDifference (e.g 400, -200),
+            //    the finalWeight will still be close to 25 and thus the enemy will not purposefully move towards the player.
+            //    To counter that we add CubeRoot, where those high posDifference values will produce finalWeight values that
+            //    are rapidly divergent from 25.
+            //
+            // -> In the Details folder of this project you can see the graphs of both a linear finalWeight function and
+            //    a cubic one, along with some calculated values so you can clearly see the difference!
             double finalWeight = 25 + 24 * CubeRoot(directionWeight); //takes values from 1 to 49 (both ends inclusive)
+
             logger.logBox.AppendText($" | fW = {finalWeight}"+Environment.NewLine);
+            //for enemyDifficulty == 1, move around randomly
             if (directionDecision >= 0 && directionDecision < finalWeight && enemyDifficulty == 1) MoveLeft(enemy, moveWeight);
+            //for enemyDifficulty == 2, follow player and continue moving sporadically while doing so.
             if (directionDecision >= finalWeight && directionDecision <= 50 && enemyDifficulty == 1) MoveRight(enemy, 6 - moveWeight);
 
+            //In both Move functions we use a weird looking moveScalar. 
+            //It's very simple as it simply states in a mathematical fashion: Move slower as you get closer to the player!
+            // This will increase shot accuracy and still have a bit a randomness left, thanks to the + 1 at the end 
+            // Math.Abs is used so as to not move in the opposite direction than intended
             if (directionDecision >= 0 && directionDecision < finalWeight && enemyDifficulty == 2)
             {
                 MoveLeft(enemy, moveWeight * Math.Abs(directionWeight*5) + 1);
@@ -681,7 +708,8 @@ namespace Space_Game
         }
 
         /// <summary>
-        /// Move the bullet object vertically through space
+        /// Move the bullet object vertically through space.
+        /// This method is triggered when bulletTimer starts.
         /// </summary>
         /// <param name="bullet">The bullet object to move</param>
         /// <param name="direction">
