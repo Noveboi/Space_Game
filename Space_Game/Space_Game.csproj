@@ -78,11 +78,23 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssignControl.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AssignControl.Designer.cs">
+      <DependentUpon>AssignControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Game.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Game.Designer.cs">
       <DependentUpon>Game.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Help.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Help.Designer.cs">
+      <DependentUpon>Help.cs</DependentUpon>
     </Compile>
     <Compile Include="Logger.cs">
       <SubType>Form</SubType>
@@ -118,8 +130,15 @@
     <Compile Include="Scores.Designer.cs">
       <DependentUpon>Scores.cs</DependentUpon>
     </Compile>
+    <Compile Include="UserSettings.cs" />
+    <EmbeddedResource Include="AssignControl.resx">
+      <DependentUpon>AssignControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Game.resx">
       <DependentUpon>Game.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Help.resx">
+      <DependentUpon>Help.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Logger.resx">
       <DependentUpon>Logger.cs</DependentUpon>

@@ -1,1 +1,10 @@
-{"SoundSet":"on","MusicSet":"on"}
+{
+  "BulletColor": {
+    "alpha": 255,
+    "red": 255,
+    "green": 0,
+    "blue":  255
+  },
+  "EnemyDifficulty": 2,
+  "GameTime": 60
+}

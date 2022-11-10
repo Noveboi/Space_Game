@@ -11,6 +11,7 @@ using System.Windows.Forms;
 
 /* TO-DO
  * -> Add more options in Options.cs, like choose bullet color, choose game time, choose enemy difficulty [P2]
+ * -- After Submission --
  * -> Add sounds (enemy bullet fire, player bullet fire, enemy hit, player hit, main menu select, main menu mouseEnter label) [P3]
  * -> Add background music (main menu, game) [P4]
  */
@@ -20,9 +21,9 @@ namespace Space_Game
     {
         #region Private Variables
         //game variables & attributes
-        private int score = 0;
-        private const int gameTime = 20; //In seconds
-        private int enemyDifficulty = 2; // 1 - ok | 2 - hard
+        private int score = 0; //raw score, will be altered in Results.cs
+        private const int gameTime = 10; //In seconds
+        private int enemyDifficulty = 2; // 1 - easy | 2 - hard
 
         private Timer gameTimer = new Timer { Interval = 1000 };
         private int elapsedSeconds = 1;
@@ -75,6 +76,9 @@ namespace Space_Game
         private bool firstOpen = true;
         Logger logger;
 
+        //JSON variables
+        private Color bulletColor = new Color();
+
         #endregion
 
         #region Game Methods and Events
@@ -88,7 +92,6 @@ namespace Space_Game
             enemyMovementTimer.Tick += EnemyMovementTimer_Tick;
             onOpenTimer.Tick += OnOpenTimer_Tick;
             starAnimateTimer.Tick += StarAnimateTimer_Tick;
-
 
             if (enemyDifficulty == 2) enemyMovementTimer.Interval = 40;
 
@@ -340,7 +343,6 @@ namespace Space_Game
                 hasBegun = true;
             }
             doCountdown("FIGHT!",3); 
-            
         }
         private void BulletTimer_Tick(object sender, EventArgs e)
         {
@@ -727,7 +729,7 @@ namespace Space_Game
             else
             { // Spawn bullet BELOW the entity (enemy)
                 bullet.Location = new Point(currentEntityLoc.X + vehicleSize.Width / 2 - 5, currentEntityLoc.Y + vehicleSize.Height / 2 + 6);
-                bullet.BackColor = System.Drawing.Color.FromArgb(255, 40, 255, 80);
+                bullet.BackColor = Color.Green;
                 bullets.Add(new Tuple<PictureBox,Label>(enemy,bullet));
             }
             Controls.Add(bullet);

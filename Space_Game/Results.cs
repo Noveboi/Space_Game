@@ -79,10 +79,18 @@ namespace Space_Game
         {
             ScoreData scoreData = new ScoreData().GetJson();
             List<DateScore> sortedData = scoreData.SortScores();
+            sortedData.Reverse();
             int ranking = 0;
+            DateTime properDate = DateTime.Parse(date);
+
             for (int i = 0; i < sortedData.Count; i++)
             {
-                if (sortedData[i].date == date) ranking = i;
+                if (DateTime.Parse(sortedData[i].date) == properDate)
+                {
+                    ranking = i + 1;
+                    MessageBox.Show($"Date match! score = {finalScore} | i = {i}");
+                    break;
+                }
             }
             if (ranking.ToString().EndsWith("1") && ranking != 11) return $"You placed {ranking}st in your score rankings!";
             else if (ranking.ToString().EndsWith("2") && ranking != 12) return $"You placed {ranking}nd in your score rankings!";

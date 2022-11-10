@@ -14,59 +14,10 @@ namespace Space_Game
 {
     public partial class Options : Form
     {
-        string jsonPath = "../../settings.json";
-
-        #region Methods and Objects
-        /// <summary>
-        /// Read settings.json and assign proper CheckStates to each checkBox
-        /// </summary>
-        private UserSettings loadSettings()
-        {
-            string json = File.ReadAllText(jsonPath);
-            UserSettings userSettings = JsonSerializer.Deserialize<UserSettings>(json);
-            checkBox1.CheckState = userSettings.SoundSet.Equals("on") ? CheckState.Checked : CheckState.Unchecked;
-            checkBox2.CheckState = userSettings.MusicSet.Equals("on") ? CheckState.Checked : CheckState.Unchecked;
-            return userSettings;
-        }
-
-        /// <summary>
-        /// Set userSettings based on CheckState of sender as CheckBox
-        /// </summary>
-        /// <param name="sender">The CheckBox control that triggers the Check event</param>
-        /// <param name="userSettings">UserSettings reference to modify</param>
-        private void setSettings(CheckBox sender, UserSettings userSettings)
-        {
-            if (sender.Equals(checkBox1))
-            {
-                userSettings.SoundSet = sender.Checked ? "on" : "off";
-            }
-            else if (sender.Equals(checkBox2))
-            {
-                userSettings.MusicSet = sender.Checked ? "on" : "off";
-            }
-
-            string json = JsonSerializer.Serialize(userSettings);
-            File.WriteAllText(jsonPath, json);
-        }
-
-        /// <summary>
-        /// Object to be interpreted by JSON
-        /// </summary>
-        private class UserSettings
-        {
-            public string SoundSet { get; set; }
-            public string MusicSet { get; set; }
-        }
-        #endregion
-
-        //Have an instance of userSettings to pass to setSettings() when Check is fired and
-        //to modify when loadSettings() is called
-        UserSettings userSettings;
-
+        UserSettings settings = new UserSettings();
         public Options()
         {
             InitializeComponent();
-
             //Prevent resizing
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
@@ -74,12 +25,20 @@ namespace Space_Game
 
         private void Options_Load(object sender, EventArgs e)
         {
-            userSettings = loadSettings();
+            settings.GrabFromJson(); //load the data from settings.json
+            MessageBox.Show(settings.BulletColor.ToString());
+            diffLabel.Text = settings.EnemyDifficulty == 1 ? "Easy" : "Veteran";
+            textBox1.Text = settings.GameTime.ToString();
+            label3.Location = new Point(Width / 2 - label3.Width/2, label3.Location.Y+30);
         }
 
-        private void checkBox_CheckedChanged(object sender, EventArgs e)
+        private void label3_MouseMove(object sender, MouseEventArgs e) { label3.Cursor = Cursors.Hand; }
+
+        private void label3_Click(object sender, EventArgs e) { new Help().Show(); }
+
+        private void label2_Click(object sender, EventArgs e)
         {
-            setSettings(sender as CheckBox, userSettings);
+
         }
     }
 
