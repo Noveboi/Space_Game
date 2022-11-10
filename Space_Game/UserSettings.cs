@@ -11,7 +11,7 @@ namespace Space_Game
 {
     internal class UserSettings
     {
-        public Color BulletColor { get; set; }
+        public string BulletColor { get; set; }
         public int GameTime { get; set; }
         public int EnemyDifficulty { get; set; }
 
@@ -23,7 +23,17 @@ namespace Space_Game
             BulletColor = data.BulletColor;
             GameTime = data.GameTime;
             EnemyDifficulty = data.EnemyDifficulty;
-            
+        }
+
+        public void SaveToJson()
+        {
+            File.WriteAllText("../../settings.json",JsonSerializer.Serialize(this));
+        }
+
+        public void Sync()
+        {
+            SaveToJson();
+            GrabFromJson();
         }
 
     }

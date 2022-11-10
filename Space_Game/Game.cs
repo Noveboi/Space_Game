@@ -22,8 +22,8 @@ namespace Space_Game
         #region Private Variables
         //game variables & attributes
         private int score = 0; //raw score, will be altered in Results.cs
-        private const int gameTime = 10; //In seconds
-        private int enemyDifficulty = 2; // 1 - easy | 2 - hard
+        private int gameTime; //In seconds
+        private int enemyDifficulty; // 1 - easy | 2 - hard
 
         private Timer gameTimer = new Timer { Interval = 1000 };
         private int elapsedSeconds = 1;
@@ -77,7 +77,8 @@ namespace Space_Game
         Logger logger;
 
         //JSON variables
-        private Color bulletColor = new Color();
+        private string bulletColor;
+        private UserSettings settings = new UserSettings();
 
         #endregion
 
@@ -93,7 +94,6 @@ namespace Space_Game
             onOpenTimer.Tick += OnOpenTimer_Tick;
             starAnimateTimer.Tick += StarAnimateTimer_Tick;
 
-            if (enemyDifficulty == 2) enemyMovementTimer.Interval = 40;
 
             Size = new Size(1280, 720);
             //Add in future (maybe), adjustable size with locked aspect ratio of 16:9
@@ -107,6 +107,7 @@ namespace Space_Game
             }
 
             announceLabel.Size = new Size(Width + 20, Height - 50);
+
         }
 
         /// <summary>
@@ -192,6 +193,13 @@ namespace Space_Game
         #endregion
         private void Game_Load(object sender, EventArgs e)
         {
+            settings.GrabFromJson();
+            gameTime = settings.GameTime;
+            enemyDifficulty = settings.EnemyDifficulty;
+            bulletColor = settings.BulletColor;
+            if (enemyDifficulty == 2) enemyMovementTimer.Interval = 40;
+
+
             vehicleSpeed = 20;
             vehicleSize = p.Size;
 
@@ -551,7 +559,7 @@ namespace Space_Game
         void enemyMove_Sporadic()
         {
             int move = RandomNumberGenerator.Create().GetHashCode()%3;
-            WatchForBullets();
+            if (enemyDifficulty == 2) WatchForBullets();
             if (move == 0)
             {
                 //Read WeightedMove() summary for more details on these 2 variables
@@ -722,14 +730,20 @@ namespace Space_Game
             bullet.Size = new Size(10, 60);
             if (currentEntityLoc.Y >= Height / 2 - 120) 
             { // Spawn bullet ABOVE the entity (player)
-                bullet.Location = new Point(currentEntityLoc.X + vehicleSize.Width / 2 - 5, currentEntityLoc.Y - vehicleSize.Height / 2 + 6);
-                bullet.BackColor = System.Drawing.Color.FromArgb(255, 255, 30, 80);
+                bullet.Location = new Point(
+                    currentEntityLoc.X + vehicleSize.Width / 2 - 5, 
+                    currentEntityLoc.Y - vehicleSize.Height / 2 + 6);
+                bullet.BackColor = ColorTranslator.FromHtml(bulletColor);
                 bullets.Add(new Tuple<PictureBox, Label>(p, bullet));
             }
             else
             { // Spawn bullet BELOW the entity (enemy)
-                bullet.Location = new Point(currentEntityLoc.X + vehicleSize.Width / 2 - 5, currentEntityLoc.Y + vehicleSize.Height / 2 + 6);
-                bullet.BackColor = Color.Green;
+                bullet.Location = new Point(
+                    currentEntityLoc.X + vehicleSize.Width / 2 - 5, 
+                    currentEntityLoc.Y + vehicleSize.Height / 2 + 6);
+                Color pColor = ColorTranslator.FromHtml(bulletColor);
+                Color eColor = Color.FromArgb(255, 255 - pColor.R, 255 - pColor.G, 255 - pColor.B);
+                bullet.BackColor = eColor;
                 bullets.Add(new Tuple<PictureBox,Label>(enemy,bullet));
             }
             Controls.Add(bullet);
@@ -750,7 +764,9 @@ namespace Space_Game
         {
             if (direction == -1 || direction == 1)
             {
-                bullet.Location = new Point(bullet.Location.X, bullet.Location.Y - bulletSpeed * direction);
+                bullet.Location = new Point(
+                    bullet.Location.X, 
+                    bullet.Location.Y - bulletSpeed * direction);
             }
             else throw new Exception("Bullet is bi-directional, it takes direction = -1 or 1.");
         }
@@ -759,7 +775,9 @@ namespace Space_Game
         {
             if (direction == -1 || direction == 1)
             {
-                bullet.Location = new Point(bullet.Location.X, bullet.Location.Y - (int)(bulletSpeed * direction * speedMultiplier));
+                bullet.Location = new Point(
+                    bullet.Location.X, 
+                    bullet.Location.Y - (int)(bulletSpeed * direction * speedMultiplier));
             }
             else throw new Exception("Bullet is bi-directional, it takes direction = -1 or 1.");
         }
@@ -772,7 +790,8 @@ namespace Space_Game
             Controls.Remove(bullet.Item2);
             bullets.Remove(bullet);
         }
-        void ClearAllBullets(List<Tuple<PictureBox, Label>> bullets){ foreach (var bullet in bullets.ToList()) clearBullet(bullet); }
+        void ClearAllBullets(List<Tuple<PictureBox, Label>> bullets)
+        { foreach (var bullet in bullets.ToList()) clearBullet(bullet); }
         #endregion
 
     }

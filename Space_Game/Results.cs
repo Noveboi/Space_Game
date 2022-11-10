@@ -20,6 +20,7 @@ namespace Space_Game
         private int gameTime;
         private int rawScore;
         private double difficultyMultiplier;
+        private int rank;
 
         private string date;
 
@@ -66,16 +67,25 @@ namespace Space_Game
 
             scoreResult.Text += $" {finalScore} ({rawScore} x {Math.Round(ScoreMultiplier(gameTime),2)} x {difficultyMultiplier}) ";
             timeResult.Text += " " + TimeSpan.FromSeconds(gameTime).ToString(@"mm\:ss");
-            rankingResult.Text = showRanking();
+            rankingResult.Text = ShowRanking();
+            ShowerWithPraise();
+
         }
 
         private void backLabel_Click(object sender, EventArgs e) { Close(); }
 
         private void backLabel_MouseMove(object sender, MouseEventArgs e) { backLabel.Cursor = Cursors.Hand; }
 
-        #region JSON Methods
+        private void ShowerWithPraise()
+        {
+            if (rank == 1) complimentLabel.Text = "New Highscore!!!";
+            if (rank > 1 && rank <= 5) complimentLabel.Text = "You did amazing!";
+            if (rank > 5 && rank <= 10) complimentLabel.Text = "You did fantastic!";
+            else complimentLabel.Text = "You did great!";
 
-        private string showRanking()
+        }
+
+        private string ShowRanking()
         {
             ScoreData scoreData = new ScoreData().GetJson();
             List<DateScore> sortedData = scoreData.SortScores();
@@ -88,10 +98,10 @@ namespace Space_Game
                 if (DateTime.Parse(sortedData[i].date) == properDate)
                 {
                     ranking = i + 1;
-                    MessageBox.Show($"Date match! score = {finalScore} | i = {i}");
                     break;
                 }
             }
+            rank = ranking;
             if (ranking.ToString().EndsWith("1") && ranking != 11) return $"You placed {ranking}st in your score rankings!";
             else if (ranking.ToString().EndsWith("2") && ranking != 12) return $"You placed {ranking}nd in your score rankings!";
             else if (ranking.ToString().EndsWith("3") && ranking != 13) return $"You placed {ranking}rd in your score rankings!";
@@ -110,6 +120,5 @@ namespace Space_Game
             string outJson = JsonSerializer.Serialize(scoreData);
             File.WriteAllText("../../scores.json",outJson);
         }
-        #endregion
     }
 }
