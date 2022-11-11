@@ -48,7 +48,7 @@ namespace Space_Game
             MaximizeBox = false;
             FormBorderStyle = FormBorderStyle.FixedSingle;
 
-            date = String.Format("{0:g}", DateTime.Now.ToString());
+            date = string.Format("{0:g}", DateTime.Now.ToString());
         }
 
         private void Results_Load(object sender, EventArgs e)
@@ -78,14 +78,15 @@ namespace Space_Game
 
         private void ShowerWithPraise()
         {
+            rank = CalculateRank();
+            MessageBox.Show(rank.ToString());
             if (rank == 1) complimentLabel.Text = "New Highscore!!!";
             if (rank > 1 && rank <= 5) complimentLabel.Text = "You did amazing!";
             if (rank > 5 && rank <= 10) complimentLabel.Text = "You did fantastic!";
-            else complimentLabel.Text = "You did great!";
-
+            else if (rank > 10) complimentLabel.Text = "You did great!";
         }
 
-        private string ShowRanking()
+        private int CalculateRank()
         {
             ScoreData scoreData = new ScoreData().GetJson();
             List<DateScore> sortedData = scoreData.SortScores();
@@ -101,7 +102,12 @@ namespace Space_Game
                     break;
                 }
             }
-            rank = ranking;
+            return ranking;
+        }
+
+        private string ShowRanking()
+        {
+            int ranking = CalculateRank();
             if (ranking.ToString().EndsWith("1") && ranking != 11) return $"You placed {ranking}st in your score rankings!";
             else if (ranking.ToString().EndsWith("2") && ranking != 12) return $"You placed {ranking}nd in your score rankings!";
             else if (ranking.ToString().EndsWith("3") && ranking != 13) return $"You placed {ranking}rd in your score rankings!";

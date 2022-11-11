@@ -43,9 +43,10 @@
             this.title.Font = new System.Drawing.Font("Niagara Engraved", 86F);
             this.title.ForeColor = System.Drawing.SystemColors.Control;
             this.title.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.title.Location = new System.Drawing.Point(21, 9);
+            this.title.Location = new System.Drawing.Point(28, 11);
+            this.title.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.title.Name = "title";
-            this.title.Size = new System.Drawing.Size(767, 132);
+            this.title.Size = new System.Drawing.Size(1023, 162);
             this.title.TabIndex = 0;
             this.title.Text = "SPACE!";
             this.title.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -55,9 +56,10 @@
             this.playText.BackColor = System.Drawing.Color.Transparent;
             this.playText.Font = new System.Drawing.Font("Niagara Solid", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.playText.ForeColor = System.Drawing.SystemColors.Control;
-            this.playText.Location = new System.Drawing.Point(288, 164);
+            this.playText.Location = new System.Drawing.Point(384, 202);
+            this.playText.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.playText.Name = "playText";
-            this.playText.Size = new System.Drawing.Size(220, 64);
+            this.playText.Size = new System.Drawing.Size(293, 79);
             this.playText.TabIndex = 1;
             this.playText.Text = "PLAY";
             this.playText.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -69,9 +71,10 @@
             this.optionsText.BackColor = System.Drawing.Color.Transparent;
             this.optionsText.Font = new System.Drawing.Font("Niagara Solid", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.optionsText.ForeColor = System.Drawing.SystemColors.Control;
-            this.optionsText.Location = new System.Drawing.Point(297, 243);
+            this.optionsText.Location = new System.Drawing.Point(396, 299);
+            this.optionsText.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.optionsText.Name = "optionsText";
-            this.optionsText.Size = new System.Drawing.Size(211, 64);
+            this.optionsText.Size = new System.Drawing.Size(281, 79);
             this.optionsText.TabIndex = 2;
             this.optionsText.Text = "OPTIONS";
             this.optionsText.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -83,9 +86,10 @@
             this.scoresText.BackColor = System.Drawing.Color.Transparent;
             this.scoresText.Font = new System.Drawing.Font("Niagara Solid", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.scoresText.ForeColor = System.Drawing.SystemColors.Control;
-            this.scoresText.Location = new System.Drawing.Point(297, 326);
+            this.scoresText.Location = new System.Drawing.Point(396, 401);
+            this.scoresText.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.scoresText.Name = "scoresText";
-            this.scoresText.Size = new System.Drawing.Size(211, 64);
+            this.scoresText.Size = new System.Drawing.Size(281, 79);
             this.scoresText.TabIndex = 3;
             this.scoresText.Text = "SCORES";
             this.scoresText.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -95,7 +99,8 @@
             // pictureBox1
             // 
             this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(-1, 9);
+            this.pictureBox1.Location = new System.Drawing.Point(-1, 11);
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(0, 0);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -104,15 +109,16 @@
             // 
             // Menu
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(1067, 554);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.scoresText);
             this.Controls.Add(this.optionsText);
             this.Controls.Add(this.playText);
             this.Controls.Add(this.title);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "Menu";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Space Pew Pew";

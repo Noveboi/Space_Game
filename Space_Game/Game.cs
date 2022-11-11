@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 /* TO-DO
- * -> Add more options in Options.cs, like choose bullet color, choose game time, choose enemy difficulty [P2]
  * -- After Submission --
  * -> Add sounds (enemy bullet fire, player bullet fire, enemy hit, player hit, main menu select, main menu mouseEnter label) [P3]
  * -> Add background music (main menu, game) [P4]

@@ -91,14 +91,17 @@
             // 
             // colorPick
             // 
+            this.colorPick.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
             this.colorPick.FlatAppearance.BorderSize = 0;
             this.colorPick.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.colorPick.ForeColor = System.Drawing.Color.Chocolate;
             this.colorPick.Location = new System.Drawing.Point(434, 99);
             this.colorPick.Name = "colorPick";
             this.colorPick.Size = new System.Drawing.Size(100, 50);
             this.colorPick.TabIndex = 12;
-            this.colorPick.UseVisualStyleBackColor = true;
+            this.colorPick.UseVisualStyleBackColor = false;
             this.colorPick.Click += new System.EventHandler(this.colorPick_Click);
+            this.colorPick.MouseDown += new System.Windows.Forms.MouseEventHandler(this.colorPick_MouseDown);
             // 
             // gameTimeLabel
             // 

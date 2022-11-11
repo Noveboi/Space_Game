@@ -68,11 +68,7 @@ namespace Space_Game
 
         private void colorPick_Click(object sender, EventArgs e)
         {
-            Random rnd = new Random();
-            Color randomColor = Color.FromArgb(255, rnd.Next(0, 255), rnd.Next(0, 255), rnd.Next(0, 255));
-            settings.BulletColor = ColorTranslator.ToHtml(randomColor);
-            settings.Sync();
-            UpdateControls();
+            
         }
 
         private void diffLabel_Click(object sender, EventArgs e)
@@ -88,6 +84,24 @@ namespace Space_Game
             if (e.Button == MouseButtons.Right) settings.GameTime--;
             settings.Sync();
             UpdateControls();
+        }
+
+        private void colorPick_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                Random rnd = new Random();
+                Color randomColor = Color.FromArgb(255, rnd.Next(0, 255), rnd.Next(0, 255), rnd.Next(0, 255));
+                settings.BulletColor = ColorTranslator.ToHtml(randomColor);
+                settings.Sync();
+                UpdateControls();
+            }
+            if (e.Button == MouseButtons.Right)
+            {
+                ColorPrompt clrp = new ColorPrompt();
+                clrp.Show();
+                clrp.FormClosed += (s, args) => settings.GrabFromJson();
+            }
         }
     }
 
