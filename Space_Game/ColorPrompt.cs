@@ -81,7 +81,7 @@ namespace Space_Game
             //valueBox.KeyPress += HexKeyPressed;
             //valueBox.TextChanged += HexTextChanged;
         }
-#endregion
+        #endregion
 
         #region Color Methods
         private void SaveColor()
