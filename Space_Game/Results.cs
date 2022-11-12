@@ -83,7 +83,6 @@ namespace Space_Game
         private void ShowerWithPraise()
         {
             rank = CalculateRank();
-            MessageBox.Show(rank.ToString());
             if (rank == 1) complimentLabel.Text = "New Highscore!!!";
             if (rank > 1 && rank <= 5) complimentLabel.Text = "You did amazing!";
             if (rank > 5 && rank <= 10) complimentLabel.Text = "You did fantastic!";

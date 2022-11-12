@@ -103,7 +103,7 @@
             this.Controls.Add(this.label1);
             this.Name = "ColorPrompt";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "ColorPrompt";
+            this.Text = "Color Your Bullet!";
             this.Load += new System.EventHandler(this.ColorPrompt_Load);
             this.ResumeLayout(false);
 

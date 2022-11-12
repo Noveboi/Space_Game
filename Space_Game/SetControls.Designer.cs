@@ -90,7 +90,7 @@
             this.controlLabel4.TabIndex = 4;
             this.controlLabel4.Text = "E - Exit Game (when Paused)";
             // 
-            // Help
+            // SetControls
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -101,9 +101,9 @@
             this.Controls.Add(this.controlLabel3);
             this.Controls.Add(this.controlLabel1);
             this.Controls.Add(this.controlsLabel);
-            this.Name = "Help";
+            this.Name = "SetControls";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "7";
+            this.Text = "Set Controls";
             this.ResumeLayout(false);
             this.PerformLayout();
 

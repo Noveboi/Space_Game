@@ -60,7 +60,6 @@
             this.Controls.Add(this.label1);
             this.Name = "AssignControl";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "AssignControl";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.AssignControl_KeyDown);
             this.ResumeLayout(false);
 

@@ -101,7 +101,7 @@
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Game";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Game";
+            this.Text = "Space!";
             this.Deactivate += new System.EventHandler(this.Game_Deactivate);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Game_FormClosing);
             this.Load += new System.EventHandler(this.Game_Load);
