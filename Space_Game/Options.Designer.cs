@@ -45,9 +45,9 @@
             this.label3.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
             this.label3.Location = new System.Drawing.Point(499, 447);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(76, 50);
+            this.label3.Size = new System.Drawing.Size(201, 50);
             this.label3.TabIndex = 5;
-            this.label3.Text = "Help!";
+            this.label3.Text = "Change Controls!";
             this.label3.Click += new System.EventHandler(this.label3_Click);
             this.label3.MouseMove += new System.Windows.Forms.MouseEventHandler(this.label3_MouseMove);
             // 

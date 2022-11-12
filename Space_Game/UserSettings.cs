@@ -9,6 +9,7 @@ using System.Text.Json;
 
 namespace Space_Game
 {
+    [Serializable]
     internal class UserSettings
     {
         public string BulletColor { get; set; }

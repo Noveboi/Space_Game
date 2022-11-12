@@ -8,6 +8,7 @@ using System.IO;
 
 namespace Space_Game
 {
+    [Serializable]
     public class DateScore
     {
         public int score { get; set; }

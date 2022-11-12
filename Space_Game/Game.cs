@@ -39,8 +39,9 @@ namespace Space_Game
 
         //stars
         private Timer starAnimateTimer = new Timer { Interval = 40 };
-        private List<Tuple<Label,int>> stars = new List<Tuple<Label, int>>();
+        private List<Tuple<Label,int>> starsList = new List<Tuple<Label, int>>();
         private int counter = 0;
+        private Stars stars;
 
         //spacecraft vehicle attributes
         private int vehicleSpeed;
@@ -78,6 +79,7 @@ namespace Space_Game
         //JSON variables
         private string bulletColor;
         private UserSettings settings = new UserSettings();
+        private UserControls userControls = new UserControls();
 
         #endregion
 
@@ -86,6 +88,7 @@ namespace Space_Game
         public Game()
         {
             InitializeComponent();
+            stars = new Stars(Width, Height, Controls, starsList);
             playerMovementTimer.Tick += PlayerMovementTimer_Tick;
             bulletTimer.Tick += BulletTimer_Tick;
             gameTimer.Tick += GameTimer_Tick;
@@ -106,7 +109,6 @@ namespace Space_Game
             }
 
             announceLabel.Size = new Size(Width + 20, Height - 50);
-
         }
 
         /// <summary>
@@ -156,40 +158,6 @@ namespace Space_Game
             starAnimateTimer.Start();
             gamePaused = false;
         }
-
-        #region Star Creation
-        Color randomBrightness()
-        {
-            int b = (RandomNumberGenerator.Create().GetHashCode() % 55) + 200;
-            return Color.FromArgb(255, b, b, b);
-        }
-        Point randomLocation(int yOffset)
-        {
-            int x = RandomNumberGenerator.Create().GetHashCode() % Width;
-            int y = RandomNumberGenerator.Create().GetHashCode() % Height;
-            return new Point(x, y + yOffset);
-        }
-
-        Size randomSize()
-        {
-            int s = (RandomNumberGenerator.Create().GetHashCode() % 3) + 3;
-            return new Size(s, s);
-        }
-        void CreateStars(int amount, int yOffset)
-        {
-            for (int i = 0; i < amount; i++)
-            {
-                Label star = new Label();
-                star.AutoSize = false;
-                star.Size = randomSize();
-                star.BackColor = randomBrightness();
-                star.Location = randomLocation(yOffset);
-                stars.Add(new Tuple<Label, int>(star, (RandomNumberGenerator.Create().GetHashCode() % 6) + 3));
-                Controls.Add(star);
-                Controls.SetChildIndex(star, -1);
-            }
-        }
-        #endregion
         private void Game_Load(object sender, EventArgs e)
         {
             settings.GrabFromJson();
@@ -198,6 +166,7 @@ namespace Space_Game
             bulletColor = settings.BulletColor;
             if (enemyDifficulty == 2) enemyMovementTimer.Interval = 40;
 
+            userControls.GrabFromJson();
 
             vehicleSpeed = 20;
             vehicleSize = p.Size;
@@ -207,9 +176,11 @@ namespace Space_Game
 
             Controls.SetChildIndex(timeLabel, -1);
             Controls.SetChildIndex(scoreLabel, -1);
-            CreateStars(30,0);
+
             Focus();
             Cursor.Hide();
+
+            starsList = stars.CreateStars(30, 0);
 
             onOpenTimer.Start();
 
@@ -227,27 +198,28 @@ namespace Space_Game
 
         #region Timers
         /// <summary>
-        /// Every star label is translated a certain Y amount for each timer tick
+        /// Every star label is translated a certain Y amount 
+        /// (the int value on the Tuple) for each timer tick
         /// </summary>
         private void StarAnimateTimer_Tick(object sender, EventArgs e)
         {
-            //every 50th counter tick, create new stars that spawn from the non-visible bottom part of the window
-            //this is to maintain a certain amount of stars flying in the background
-            if (counter == 50) CreateStars(25,Height); 
+            //every 50th counter tick, create new stars that spawn from the non-visible
+            //bottom part of the window this is to maintain a certain amount of
+            //stars moving in the background
+            if (counter == 50) starsList = stars.CreateStars(25,Height); 
 
-            logger.label1.Text = $"Exising stars: {stars.Count}";
-            foreach (var star in stars.ToList())
+            logger.label1.Text = $"Exising stars: {starsList.Count}";
+            foreach (var star in starsList.ToList())
             {
                 star.Item1.Location = new Point(star.Item1.Location.X, (star.Item1.Location.Y - star.Item2));
                 if (star.Item1.Location.Y < 0)
                 {
                     Controls.Remove(star.Item1);
-                    stars.Remove(star);
+                    starsList.Remove(star);
                 }
             }
             //(% n) = reset counter every n ticks
             counter = (counter + 1) % 150;
-            
         }
         private void EnemyMovementTimer_Tick(object sender, EventArgs e)
         {
@@ -287,15 +259,14 @@ namespace Space_Game
             }
             #endregion
 
+            #region Sporadic Movement
             if (dec > 0 && dec <= maxRand - 1 && !startSweep)
             {
                 logger.moveBox.AppendText($"{getTime()} - {dec} | ");
                 enemyMove_Sporadic();
-                if (dec % 5 == 0)
-                {
-                    SpawnBullet(enemy.Location);
-                }
+                if (dec % 5 == 0) SpawnBullet(enemy.Location);
             }
+            #endregion
         }
         /// <summary>
         /// Keeps time of seconds passed since Game start, end is responsible for ending the game once 
@@ -421,15 +392,13 @@ namespace Space_Game
                     case Keys.D:
                         mr = true;
                         break;
-                    //Fire a bullet
-                    case Keys.Space:
-                        SpawnBullet(p.Location);
-                        //logger.logBox.AppendText($"{getTime()} - Bullet Fired at " +
-                        //    $"{new Point(p.Location.X + vehicleSize.Width / 2 - 5,p.Location.Y)}{Environment.NewLine}");
-                        break;
                 }
             }
-            if (e.KeyCode == Keys.Escape && hasBegun)
+            if (e.KeyCode == userControls.Shoot && gameRunning)
+            {
+                SpawnBullet(p.Location);
+            }
+            if (e.KeyCode == userControls.PauseGame && hasBegun)
             {
                 if (gameRunning) 
                 {
@@ -452,7 +421,7 @@ namespace Space_Game
                 if (gameRunning && firstOpen) { Focus(); firstOpen = false; }
                 if(gameRunning && !firstOpen) logger.Show(); 
             }
-            if (e.KeyCode == Keys.E && gamePaused) Close();
+            if (e.KeyCode == userControls.ExitGame && gamePaused) Close();
 
             PlayerMove();
             playerMovementTimer.Start();
@@ -460,7 +429,7 @@ namespace Space_Game
         private void Game_KeyUp(object sender, KeyEventArgs e)
         {
             kdk = Keys.None;
-            if (e.KeyCode == Keys.Space) return;
+            if (e.KeyCode == userControls.Shoot) return;
 
             switch (e.KeyCode)
             {
@@ -722,24 +691,24 @@ namespace Space_Game
         #endregion
 
         #region Bullet Mechanics
-        void SpawnBullet(Point currentEntityLoc)
+        void SpawnBullet(Point currentEntityLocation)
         {
             Label bullet = new Label();
             bullet.AutoSize = false;
             bullet.Size = new Size(10, 60);
-            if (currentEntityLoc.Y >= Height / 2 - 120) 
+            if (currentEntityLocation.Y >= Height / 2 - 120) 
             { // Spawn bullet ABOVE the entity (player)
                 bullet.Location = new Point(
-                    currentEntityLoc.X + vehicleSize.Width / 2 - 5, 
-                    currentEntityLoc.Y - vehicleSize.Height / 2 + 6);
+                    currentEntityLocation.X + vehicleSize.Width / 2 - 5, 
+                    currentEntityLocation.Y - vehicleSize.Height / 2 + 6);
                 bullet.BackColor = ColorTranslator.FromHtml(bulletColor);
                 bullets.Add(new Tuple<PictureBox, Label>(p, bullet));
             }
             else
             { // Spawn bullet BELOW the entity (enemy)
                 bullet.Location = new Point(
-                    currentEntityLoc.X + vehicleSize.Width / 2 - 5, 
-                    currentEntityLoc.Y + vehicleSize.Height / 2 + 6);
+                    currentEntityLocation.X + vehicleSize.Width / 2 - 5, 
+                    currentEntityLocation.Y + vehicleSize.Height / 2 + 6);
                 Color pColor = ColorTranslator.FromHtml(bulletColor);
                 Color eColor = Color.FromArgb(255, 255 - pColor.R, 255 - pColor.G, 255 - pColor.B);
                 bullet.BackColor = eColor;

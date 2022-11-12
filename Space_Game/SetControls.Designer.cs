@@ -1,6 +1,6 @@
 ﻿namespace Space_Game
 {
-    partial class Help
+    partial class SetControls
     {
         /// <summary>
         /// Required designer variable.

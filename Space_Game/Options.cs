@@ -9,23 +9,56 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Text.Json;
 using System.IO;
+using System.Security.Cryptography;
 
 namespace Space_Game
 {
     public partial class Options : Form
     {
         UserSettings settings = new UserSettings();
+        UserControls controls = new UserControls();
+        Stars bgStars;
+        List<Tuple<Label, int>> starsList = new List<Tuple<Label, int>>();
+        Timer starAnimationTimer = new Timer() { Interval = 38 };
+        int tickCounter = 0;
+
         public Options()
         {
             InitializeComponent();
             //Prevent resizing
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
+
+            starAnimationTimer.Tick += StarAnimationTimer_Tick;
+        }
+
+        private void StarAnimationTimer_Tick(object sender, EventArgs e)
+        {
+            foreach(var star in starsList.ToList())
+            {
+                int shine = RandomNumberGenerator.Create().GetHashCode() % 10;
+                int brightnessVar = RandomNumberGenerator.Create().GetHashCode() % 75;
+                if (tickCounter % 2 == 0 && shine == 3)
+                {
+                    int b = 180 + brightnessVar;
+                    star.Item1.BackColor = Color.FromArgb(255, b, b, b);
+                }
+                else if (tickCounter % 2 == 1 && shine == 3)
+                {
+                    if (star.Item1.BackColor.R >= 100)
+                    { 
+                        int b = star.Item1.BackColor.R - brightnessVar;
+                        star.Item1.BackColor = Color.FromArgb(255, b, b, b);
+                    } 
+                }
+            }
+            tickCounter++;
         }
 
         private void Options_Load(object sender, EventArgs e)
         {
             settings.GrabFromJson(); //load the data from settings.json
+            bgStars = new Stars(Width, Height, Controls, starsList);
 
             UpdateControls();
 
@@ -39,6 +72,9 @@ namespace Space_Game
             diffLabel.TextAlign = ContentAlignment.MiddleCenter;
 
             label3.Location = new Point(Width / 2 - label3.Width/2, label3.Location.Y+30);
+
+            bgStars.CreateStars(40, 0);
+            starAnimationTimer.Start();
         }
 
         private void UpdateControls()
@@ -59,7 +95,10 @@ namespace Space_Game
 
         private void label3_MouseMove(object sender, MouseEventArgs e) { label3.Cursor = Cursors.Hand; }
 
-        private void label3_Click(object sender, EventArgs e) { new Help().Show(); }
+        private void label3_Click(object sender, EventArgs e) 
+        { 
+            new SetControls().Show(); 
+        }
 
         private void label2_Click(object sender, EventArgs e)
         {

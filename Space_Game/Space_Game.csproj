@@ -90,17 +90,19 @@
     <Compile Include="ColorPrompt.Designer.cs">
       <DependentUpon>ColorPrompt.cs</DependentUpon>
     </Compile>
+    <Compile Include="JsonMethods.cs" />
+    <Compile Include="UserControls.cs" />
     <Compile Include="Game.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Game.Designer.cs">
       <DependentUpon>Game.cs</DependentUpon>
     </Compile>
-    <Compile Include="Help.cs">
+    <Compile Include="SetControls.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Help.Designer.cs">
-      <DependentUpon>Help.cs</DependentUpon>
+    <Compile Include="SetControls.Designer.cs">
+      <DependentUpon>SetControls.cs</DependentUpon>
     </Compile>
     <Compile Include="Logger.cs">
       <SubType>Form</SubType>
@@ -136,6 +138,7 @@
     <Compile Include="Scores.Designer.cs">
       <DependentUpon>Scores.cs</DependentUpon>
     </Compile>
+    <Compile Include="Stars.cs" />
     <Compile Include="UserSettings.cs" />
     <EmbeddedResource Include="AssignControl.resx">
       <DependentUpon>AssignControl.cs</DependentUpon>
@@ -146,8 +149,8 @@
     <EmbeddedResource Include="Game.resx">
       <DependentUpon>Game.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Help.resx">
-      <DependentUpon>Help.cs</DependentUpon>
+    <EmbeddedResource Include="SetControls.resx">
+      <DependentUpon>SetControls.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Logger.resx">
       <DependentUpon>Logger.cs</DependentUpon>
@@ -174,7 +177,6 @@
     <EmbeddedResource Include="Scores.resx">
       <DependentUpon>Scores.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="dummyScores.json" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -193,6 +195,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Sprites\spaceship.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="userControls.json" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Text.Json.6.0.6\build\System.Text.Json.targets" Condition="Exists('..\packages\System.Text.Json.6.0.6\build\System.Text.Json.targets')" />
