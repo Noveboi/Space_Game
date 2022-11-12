@@ -90,7 +90,6 @@
     <Compile Include="ColorPrompt.Designer.cs">
       <DependentUpon>ColorPrompt.cs</DependentUpon>
     </Compile>
-    <Compile Include="JsonMethods.cs" />
     <Compile Include="UserControls.cs" />
     <Compile Include="Game.cs">
       <SubType>Form</SubType>

@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.label3 = new System.Windows.Forms.Label();
+            this.setControlsLabel = new System.Windows.Forms.Label();
             this.colorLabel = new System.Windows.Forms.Label();
             this.enemyLabel = new System.Windows.Forms.Label();
             this.timeLabel = new System.Windows.Forms.Label();
@@ -38,18 +38,18 @@
             this.diffLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // label3
+            // setControlsLabel
             // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Niagara Solid", 28.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.label3.Location = new System.Drawing.Point(499, 447);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(201, 50);
-            this.label3.TabIndex = 5;
-            this.label3.Text = "Change Controls!";
-            this.label3.Click += new System.EventHandler(this.label3_Click);
-            this.label3.MouseMove += new System.Windows.Forms.MouseEventHandler(this.label3_MouseMove);
+            this.setControlsLabel.AutoSize = true;
+            this.setControlsLabel.Font = new System.Drawing.Font("Niagara Solid", 28.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.setControlsLabel.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.setControlsLabel.Location = new System.Drawing.Point(499, 447);
+            this.setControlsLabel.Name = "setControlsLabel";
+            this.setControlsLabel.Size = new System.Drawing.Size(201, 50);
+            this.setControlsLabel.TabIndex = 5;
+            this.setControlsLabel.Text = "Change Controls!";
+            this.setControlsLabel.Click += new System.EventHandler(this.setControlsLabel_Click);
+            this.setControlsLabel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.setControlsLabel_MouseMove);
             // 
             // colorLabel
             // 
@@ -72,7 +72,6 @@
             this.enemyLabel.Size = new System.Drawing.Size(333, 85);
             this.enemyLabel.TabIndex = 7;
             this.enemyLabel.Text = "Enemy Player:";
-            this.enemyLabel.Click += new System.EventHandler(this.label2_Click);
             // 
             // timeLabel
             // 
@@ -100,7 +99,6 @@
             this.colorPick.Size = new System.Drawing.Size(100, 50);
             this.colorPick.TabIndex = 12;
             this.colorPick.UseVisualStyleBackColor = false;
-            this.colorPick.Click += new System.EventHandler(this.colorPick_Click);
             this.colorPick.MouseDown += new System.Windows.Forms.MouseEventHandler(this.colorPick_MouseDown);
             // 
             // gameTimeLabel
@@ -139,7 +137,7 @@
             this.Controls.Add(this.timeLabel);
             this.Controls.Add(this.enemyLabel);
             this.Controls.Add(this.colorLabel);
-            this.Controls.Add(this.label3);
+            this.Controls.Add(this.setControlsLabel);
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Options";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -152,7 +150,7 @@
 
         #endregion
 
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label setControlsLabel;
         private System.Windows.Forms.Label colorLabel;
         private System.Windows.Forms.Label enemyLabel;
         private System.Windows.Forms.Label timeLabel;

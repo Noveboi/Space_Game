@@ -10,6 +10,10 @@ using System.Windows.Media.Media3D;
 
 namespace Space_Game
 {
+    /// <summary>
+    /// Create randomly placed, sized and bright labels in the window.
+    /// Here they are used only for aesthetic purposes and serve no gameplay purpose
+    /// </summary>
     internal class Stars
     {
         Control.ControlCollection Controls;
@@ -44,6 +48,10 @@ namespace Space_Game
             int s = (RandomNumberGenerator.Create().GetHashCode() % 3) + 3;
             return new Size(s, s);
         }
+
+        /// <param name="amount">How many stars to create</param>
+        /// <param name="yOffset">How high or low to place the stars</param>
+        /// <returns>List containing all visible star controls</returns>
         public List<Tuple<Label,int>> CreateStars(int amount, int yOffset)
         {
             for (int i = 0; i < amount; i++)

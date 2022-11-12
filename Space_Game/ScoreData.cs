@@ -15,13 +15,18 @@ namespace Space_Game
         public string date { get; set; }
     }
 
+    /// <summary>
+    /// Provides C# to JSON interaction for all scores and the corresponding date that
+    /// they were submitted at.
+    /// </summary>
+    [Serializable]
     internal class ScoreData
     {
         public Dictionary<string, int> scores { get; set; }
         public Dictionary<string, string> dates { get; set; }
 
         /// <summary>
-        /// Add the latest scores after loading json data
+        /// Add the latest scores after loading JSON data
         /// </summary>
         public void AppendLatestScores(string newScoreKey, int newScore, string newDateKey, string newDate)
         {
@@ -49,6 +54,16 @@ namespace Space_Game
             return list;
         }
 
+        /// <summary>
+        /// Provides info about how to compare the DateScore object
+        /// </summary>
+        /// <param name="ds1">DateScore to be compared to ds2</param>
+        /// <param name="ds2">DateScore to compare to ds1</param>
+        /// <returns>
+        /// -- -1: ds1 is SMALLER than ds2
+        /// -- 0: ds1 is EQUAL to ds2
+        /// -- 1: ds1 is LARGER than ds2
+        /// </returns>
         private static int compareScore(DateScore ds1, DateScore ds2)
         {
             return ds1.score.CompareTo(ds2.score);

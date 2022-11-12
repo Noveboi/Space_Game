@@ -13,6 +13,9 @@ using System.Windows.Forms;
 
 namespace Space_Game
 {
+    /// <summary>
+    /// Shows the score and score ranking after the game ends
+    /// </summary>
     public partial class Results : Form
     {
         //Passed from Game.cs
@@ -65,7 +68,8 @@ namespace Space_Game
             rankingResult.Parent = pictureBox1;
             backLabel.Parent = pictureBox1;
 
-            scoreResult.Text += $" {finalScore} ({rawScore} x {Math.Round(ScoreMultiplier(gameTime),2)} x {difficultyMultiplier}) ";
+            scoreResult.Text += 
+                $" {finalScore} ({rawScore} x {Math.Round(ScoreMultiplier(gameTime),2)} x {difficultyMultiplier}) ";
             timeResult.Text += " " + TimeSpan.FromSeconds(gameTime).ToString(@"mm\:ss");
             rankingResult.Text = ShowRanking();
             ShowerWithPraise();

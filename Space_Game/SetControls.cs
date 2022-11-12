@@ -11,6 +11,10 @@ using System.Windows.Media.Effects;
 
 namespace Space_Game
 {
+    /// <summary>
+    /// Provides the user info about what key is assigned to each control and
+    /// gives the option to change certain key assignments
+    /// </summary>
     public partial class SetControls : Form
     {
         List<Tuple<Label, string>> controlFunctions = new List<Tuple<Label, string>>();
@@ -22,7 +26,9 @@ namespace Space_Game
             userControls.GrabFromJson();
 
             InitializeComponent();
+
             controlLabel1.Location = new Point(controlLabel1.Location.X, controlLabel1.Location.Y + 20);
+
             OrganizeLabelGroup("controlLabel");
             controlFunctions.Add(new Tuple<Label, string>(controlLabel2, "Shoot"));
             controlFunctions.Add(new Tuple<Label, string>(controlLabel3, "PauseGame"));
@@ -31,16 +37,22 @@ namespace Space_Game
             UpdateLabels();
 
         }
-
+        ///<param name="sharedName">The name that is shared between labels</param>
+        /// <returns>The total amount of labels that have a common shared name</returns>
         private int GetSharedNameLabelCount(string sharedName)
         {
             int count = 0;
+            //Loop through all controls
             for (int i = 0; i < Controls.Count; i++)
             {
                 if (Controls.ContainsKey($"{sharedName}{i}")) count++;
             }
             return count;
         }
+        /// <summary>
+        /// Stack the given label group one on top of the other
+        /// </summary>
+        /// <param name="sharedName">The name that is shared between labels</param>
         private void OrganizeLabelGroup(string sharedName)
         {
             for (int i = 1; i <= GetSharedNameLabelCount(sharedName); i++)
@@ -74,9 +86,10 @@ namespace Space_Game
                     break;
                 }
             }
-            
         }
-
+        /// <summary>
+        /// Updates the Label text for each control that is customizable
+        /// </summary>
         private void UpdateLabels()
         {
             controlLabel2.Text = kc.ConvertToString(userControls.Shoot) + " | Shoot";

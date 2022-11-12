@@ -30,18 +30,21 @@ namespace Space_Game
         }
         private void play_Click(object sender, EventArgs e)
         {//hide Menu when PLAY is clicked
-         //close Menu when Game form is closed
+         //close Menu when Game form is closed BEFORE game has finsihed
+         //show the same Menu AFTER game is finisheds
             Game game = new Game();
             game.Show();
+
             game.MaximizeBox = false;
             game.MinimizeBox = false;
+
             if (game.Focused) Hide();
+
             game.FormClosed += (s, args) =>
             {
                 if (game.resultsClosed) Show();
                 else Close();
             };
-            
         }
 
         //MouseEnter event
@@ -61,14 +64,14 @@ namespace Space_Game
         {
             Options options = new Options();
             options.Show();
-            options.Size = new Size(this.Width, this.Height);
+            options.Size = new Size(Width, Height);
         }
 
         private void scoresText_Click(object sender, EventArgs e)
         {
             Scores scores = new Scores();
             scores.Show();
-            scores.Size = new Size(this.Width / 2, 600);
+            scores.Size = new Size(Width / 2, 600);
         }
     }
 }

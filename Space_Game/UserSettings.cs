@@ -9,6 +9,9 @@ using System.Text.Json;
 
 namespace Space_Game
 {
+    /// <summary>
+    /// Provides C# to JSON interaction for the game settings that can be changed by the user
+    /// </summary>
     [Serializable]
     internal class UserSettings
     {

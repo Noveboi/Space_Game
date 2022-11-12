@@ -10,6 +10,10 @@ using System.Windows.Forms;
 
 namespace Space_Game
 {
+    /// <summary>
+    /// Simple pop-up window that allows the user to press any valid key and and assign
+    /// that key to the specified control (controlFunction)
+    /// </summary>
     public partial class AssignControl : Form
     {
         string controlFunction;
@@ -18,8 +22,8 @@ namespace Space_Game
 
         public AssignControl(string ControlFunction)
         {
-            controlFunction = ControlFunction;
             InitializeComponent();
+            controlFunction = ControlFunction;
             label2.Text = ControlFunction;
             label1.Text = "Press any valid key\nPress Enter to assign key";
 
@@ -27,7 +31,7 @@ namespace Space_Game
             controls.GrabFromJson();
         }
         /// <summary>
-        /// Revert to defaults
+        /// Revert any control to default settings IF control has an invalid key (KeyCode == 0)
         /// </summary>
         private void CheckForInvalidControls()
         {

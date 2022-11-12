@@ -9,6 +9,9 @@ using System.IO;
 
 namespace Space_Game
 {
+    /// <summary>
+    /// Provides C# to JSON interaction for the controls that can be changed by the user
+    /// </summary>
     [Serializable]
     internal class UserControls
     {

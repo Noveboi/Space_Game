@@ -14,6 +14,11 @@ namespace Space_Game
     public partial class Logger : Form
     {
         Game gameRef;
+        /// <summary>
+        /// Simple debugging tool I used across the development of this game, it is accessible to the player
+        /// if they are interested in details
+        /// </summary>
+        /// <param name="Game"></param>
         public Logger(Game Game)
         {
             gameRef = Game;

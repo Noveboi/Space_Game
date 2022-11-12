@@ -23,6 +23,10 @@ namespace Space_Game
             settings.GrabFromJson();
         }
 
+        #region Control Creation
+        /// <summary>
+        /// Create and properly align the three RGB Controls
+        /// </summary>
         private void CreateRGBControls()
         {
             for (int i = 0; i < 3; i++)
@@ -46,37 +50,54 @@ namespace Space_Game
                     rgbLabel.Location.X + (rgbLabel.Width/3) * (i+1) - 67,
                     rgbLabel.Location.Y + rgbLabel.Height + 6);
                 Controls.Add(valueBox);
-                valueBox.TextChanged += rgbTextChanged;
-                valueBox.KeyPress += rgbTextKeyPress;
+                valueBox.TextChanged += RGBTextChanged;
+                valueBox.KeyPress += RGBTextKeyPress;
             }
         }
-        //https://stackoverflow.com/a/463335
-        private void rgbTextKeyPress(object sender, KeyPressEventArgs e) 
+        /// <summary>
+        /// Creates and properly alings the hexValue textBox
+        /// </summary>
+        private void CreateHexControl()
         {
-            TextBox s = sender as TextBox;
+            TextBox valueBox = new TextBox();
+            TextBox gValue = (TextBox)Controls.Find("gValue", true)[0];
+            valueBox.Name = "hexValue";
 
-            if (e.KeyChar == (char)Keys.Enter)
-            {
-                s.ReadOnly = true;
-                int ct = 0;
-                foreach(var tb in Controls.OfType<TextBox>())
-                {
-                    if (tb.ReadOnly) ct++;
-                }
-                if (ct == 3)
-                {
-                    settings.BulletColor = ColorTranslator.ToHtml(CurrentColor(false));
-                    settings.SaveToJson();
-                    MessageBox.Show($"Color saved successfully! {ColorTranslator.ToHtml(CurrentColor(false))}");
-                }
-            }
+            valueBox.Multiline = true;
+            valueBox.Size = new Size(90, 30);
+            valueBox.BorderStyle = BorderStyle.None;
+            valueBox.Font = new Font("Roboto", 13);
+            valueBox.Font = new Font(valueBox.Font, FontStyle.Bold);
+            valueBox.TextAlign = HorizontalAlignment.Center;
 
-            if(s.Text.Length >= 3 && !char.IsControl(e.KeyChar) && s.SelectionLength != s.Text.Length) 
-            { e.Handled = true; }
+            valueBox.ForeColor = Color.FromArgb(255, 10, 10, 10);
+            valueBox.BackColor = Color.White;
 
-            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) 
-                && (e.KeyChar != '.')) e.Handled = true;
+
+            valueBox.Location = new Point(
+                gValue.Location.X + gValue.Width / 2 - valueBox.Width / 2,
+                hexLabel.Location.Y + hexLabel.Height);
+            Controls.Add(valueBox);
+            //valueBox.KeyPress += HexKeyPressed;
+            //valueBox.TextChanged += HexTextChanged;
         }
+#endregion
+
+        #region Color Methods
+        private void SaveColor()
+        {
+            if (validColor)
+            {
+                settings.BulletColor = ColorTranslator.ToHtml(CurrentColor(false));
+                settings.SaveToJson();
+                MessageBox.Show("Color saved successfully!");
+                Close();
+            }
+        }
+        /// <summary>
+        /// Get the current color values from the RGB controls 
+        /// </summary>
+        /// <returns>List of the color values ([0] = R, [1] = G, [2] = B)</returns>
         private List<int> CurrentColorValues()
         {
             TextBox rValue = (TextBox)Controls.Find("rValue", true)[0];
@@ -91,20 +112,45 @@ namespace Space_Game
             l.Add(b);
             return l;
         }
-
+        /// <param name="complement">Set to true to return the complementary color</param>
+        /// <returns>The current color  from the RGB controls</returns>
         private Color CurrentColor(bool complement)
         {
-            TextBox rValue = (TextBox)Controls.Find("rValue", true)[0];
-            TextBox gValue = (TextBox)Controls.Find("gValue", true)[0];
-            TextBox bValue = (TextBox)Controls.Find("bValue", true)[0];
-            int r = rValue.Text != "" && Int32.Parse(rValue.Text) <= 255 ? Int32.Parse(rValue.Text) : -1;
-            int g = gValue.Text != "" && Int32.Parse(gValue.Text) <= 255 ? Int32.Parse(gValue.Text) : -1;
-            int b = bValue.Text != "" && Int32.Parse(bValue.Text) <= 255 ? Int32.Parse(bValue.Text) : -1;
-            if (!complement) return Color.FromArgb(255, r, g, b);
-            else return Color.FromArgb(255, 255 - r, 255 - g, 255 - b);
-        }
+            var cc = CurrentColorValues();
+            if (!complement && !(cc[0] == -1 || cc[1] == -1 || cc[2] == -1)) 
+                return Color.FromArgb(255, cc[0], cc[1], cc[2]);
 
-        private void rgbTextChanged(object sender, EventArgs e) 
+            if (complement && !(cc[0] == -1 || cc[1] == -1 || cc[2] == -1))
+                return Color.FromArgb(255, 255 - cc[0], 255 - cc[1], 255 - cc[2]);
+            else
+                return Color.FromArgb(0,0,0,0);
+        }
+        #endregion
+
+        #region TextChanged and KeyPress Methods
+        /// <summary>
+        /// Makes sure user cannot enter anything but 1-long to 3-long digit sequences
+        /// </summary>
+        private void RGBTextKeyPress(object sender, KeyPressEventArgs e) 
+        {
+            TextBox s = sender as TextBox;
+
+            if (e.KeyChar == (char)Keys.Enter) SaveColor();
+
+            if (s.Text.Length >= 3 && !char.IsControl(e.KeyChar) && s.SelectionLength != s.Text.Length) 
+            { e.Handled = true; }
+
+            //Copied and modified from: https://stackoverflow.com/a/463335
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar)) e.Handled = true;
+        }
+       
+        /// <summary>
+        /// If the RGB controls contain a valid color, change the display bullet's color and
+        /// change the hex value to display the corresponding hex color code
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RGBTextChanged(object sender, EventArgs e) 
         {
             TextBox hexValue = (TextBox)(Controls.Find("hexValue", true))[0];
             var cc = CurrentColorValues();
@@ -124,28 +170,63 @@ namespace Space_Game
             }
         }
 
-        private void CreateHexControl()
-        {
-            TextBox valueBox = new TextBox();
-            TextBox gValue = (TextBox)Controls.Find("gValue", true)[0];
-            valueBox.Name = "hexValue";
+        //private void HexTextChanged(object sender, EventArgs e)
+        //{
+        //    TextBox rValue = (TextBox)Controls.Find("rValue", true)[0];
+        //    TextBox gValue = (TextBox)Controls.Find("gValue", true)[0];
+        //    TextBox bValue = (TextBox)Controls.Find("bValue", true)[0];
+        //    var c = CurrentColor(false);
+        //    if (c.A == 0)
+        //    {
+        //        bullet.BackColor = Color.White;
+        //        rValue.Text = "";
+        //        gValue.Text = "";
+        //        bValue.Text = "";
+        //        validColor = false;
+        //    }
+        //    else
+        //    {
+        //        bullet.BackColor = c;
+        //        rValue.Text = c.R.ToString();
+        //        gValue.Text = c.G.ToString();
+        //        bValue.Text = c.B.ToString();
+        //        validColor = true;
+        //    }
+        //}
 
-            valueBox.Multiline = true;
-            valueBox.Size = new Size(90, 30);
-            valueBox.BorderStyle = BorderStyle.None;
-            valueBox.Font = new Font("Roboto", 13);
-            valueBox.Font = new Font(valueBox.Font, FontStyle.Bold);
-            valueBox.TextAlign = HorizontalAlignment.Center;
+        //private bool IsAThroughForSharp(char c)
+        //{
+        //    if ((c >= 97 && c <= 102) || (c >= 65 && c <= 70) || c == '#') return true;
+        //    return false;
+        //}
 
-            valueBox.ForeColor = Color.FromArgb(255, 10, 10, 10);
-            valueBox.BackColor = Color.White;
+        //private void HexKeyPressed(object sender, KeyPressEventArgs e)
+        //{
+        //    TextBox sen = sender as TextBox;
+        //    bool notValidChar = !IsAThroughForSharp(e.KeyChar)
+        //        && !char.IsControl(e.KeyChar)
+        //        && !char.IsDigit(e.KeyChar);
 
+        //    if (e.KeyChar == (char)Keys.Enter) SaveColor();
 
-            valueBox.Location = new Point(
-                gValue.Location.X + gValue.Width/2 - valueBox.Width/2,
-                hexLabel.Location.Y + hexLabel.Height);
-            Controls.Add(valueBox);
-        }
+        //    if (sen.Text.Length >= 7 && !char.IsControl(e.KeyChar)) e.Handled = true;
+
+        //    if (notValidChar) e.Handled = true;
+
+        //    sen.TextChanged += (s, args) =>
+        //    {
+        //        if (sen.Text.Length == 1 && !char.IsControl(e.KeyChar))
+        //        {
+        //            sen.Text = sen.Text.Replace(sen.Text, $"#{e.KeyChar}");
+
+        //            //Copied from https://stackoverflow.com/a/20423272
+        //            sen.SelectionStart = sen.Text.Length;
+        //            sen.SelectionLength = 0;
+        //        }
+        //        else if (char.IsControl(e.KeyChar)) { }
+        //    };
+        //}
+        #endregion
 
         private void ColorPrompt_Load(object sender, EventArgs e)
         {

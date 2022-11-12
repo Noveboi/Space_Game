@@ -10,13 +10,17 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Space_Game
-{
+{ 
     public partial class Scores : Form
     {
 
         private Font font = new Font("Niagara Solid", 24);
         private const int numHeight = 30;
 
+        /// <summary>
+        /// Create the ranking numbers located at the left-most part of the window
+        /// </summary>
+        /// <returns>The list of Labels created</returns>
         private List<Label> createNumCol()
         {
             List<Label> labels = new List<Label>();
@@ -59,12 +63,20 @@ namespace Space_Game
             return label;
         }
 
+        /// <summary>
+        /// Create a Label controls both the score column and the date column
+        /// </summary>
         private void createDateScoreCols(DateScore dateScore, int i) //Put all under scoreLabel
         {
+            //Interchange between two different colors for clarity
             Color color = i % 2 == 0 ? Color.White : Color.FromArgb(255, 255, 161, 209);
+
             Size sharedSize = new Size(scoreLabel.Width, numHeight);
-            Point scoreLoc = new Point(scoreLabel.Location.X, scoreLabel.Location.Y + ((numHeight + 7) * i) + numLabel.Height);
-            Point dateLoc = new Point(dateLabel.Location.X, scoreLabel.Location.Y + ((numHeight + 7) * i) + numLabel.Height);
+
+            Point scoreLoc = new Point(scoreLabel.Location.X, 
+                scoreLabel.Location.Y + ((numHeight + 7) * i) + numLabel.Height);
+            Point dateLoc = new Point(dateLabel.Location.X, 
+                scoreLabel.Location.Y + ((numHeight + 7) * i) + numLabel.Height);
 
             Label sLabel = createLabel(color, sharedSize, scoreLoc, dateScore.score.ToString());
             Label dLabel = createLabel(color, sharedSize, dateLoc, dateScore.date);
@@ -80,8 +92,14 @@ namespace Space_Game
             ScoreData scoreData = new ScoreData().GetJson();
             List<DateScore> dateScore = scoreData.SortScores();
             dateScore.Reverse();
-            if (dateScore.Count >= 10) for (int i = 0; i < 10; i++) { createDateScoreCols(dateScore[i], i); }
-            else for (int i = 0; i < dateScore.Count; i++) { createDateScoreCols(dateScore[i], i); }
+            //If there are more than 10 scores stored in the JSON file,
+            //show only the top 10.
+            if (dateScore.Count >= 10) for (int i = 0; i < 10; i++) 
+                { createDateScoreCols(dateScore[i], i); }
+
+            //Else if scores are less than ten, show all stored scores
+            else for (int i = 0; i < dateScore.Count; i++) 
+                { createDateScoreCols(dateScore[i], i); }
 
             Controls.SetChildIndex(bg, -1);
 

@@ -35,7 +35,7 @@ namespace Space_Game
         private int countdown = 3;
         public bool resultsClosed = false;
         private bool gamePaused = false;
-        private bool hasBegun = false;
+        private bool gameHasBegun = false;
 
         //stars
         private Timer starAnimateTimer = new Timer { Interval = 40 };
@@ -160,12 +160,14 @@ namespace Space_Game
         }
         private void Game_Load(object sender, EventArgs e)
         {
+            //Set-up game according to the UserSettings
             settings.GrabFromJson();
             gameTime = settings.GameTime;
             enemyDifficulty = settings.EnemyDifficulty;
             bulletColor = settings.BulletColor;
             if (enemyDifficulty == 2) enemyMovementTimer.Interval = 40;
 
+            //Assign the controls from UserControls
             userControls.GrabFromJson();
 
             vehicleSpeed = 20;
@@ -180,13 +182,18 @@ namespace Space_Game
             Focus();
             Cursor.Hide();
 
+            //Initially create stars without yOffset
             starsList = stars.CreateStars(30, 0);
 
+            //This will begin the 3,2,1 FIGHT! countdown
             onOpenTimer.Start();
 
+            //Position enemy in the center of the window
             enemy.Location = new Point(Width/2 - enemy.Width/2, enemy.Location.Y);
         }
-
+        /// <summary>
+        /// Open a Yes/No prompt when the user attempts to exit before the game ends
+        /// </summary>
         private void Game_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (e.CloseReason == CloseReason.UserClosing && elapsedSeconds <= gameTime)
@@ -209,9 +216,11 @@ namespace Space_Game
             if (counter == 50) starsList = stars.CreateStars(25,Height); 
 
             logger.label1.Text = $"Exising stars: {starsList.Count}";
+
             foreach (var star in starsList.ToList())
             {
                 star.Item1.Location = new Point(star.Item1.Location.X, (star.Item1.Location.Y - star.Item2));
+                //Clean-up and remove off-screen stars
                 if (star.Item1.Location.Y < 0)
                 {
                     Controls.Remove(star.Item1);
@@ -221,18 +230,28 @@ namespace Space_Game
             //(% n) = reset counter every n ticks
             counter = (counter + 1) % 150;
         }
+        /// <summary>
+        /// Each tick, a decision is randomly made (ranges from 1 to maxRand)
+        /// and based on that random decision the enemy moves and fires bullets accordingly
+        /// </summary>
         private void EnemyMovementTimer_Tick(object sender, EventArgs e)
         {
+            #region Logger Stuff
             string time = getTime();
             logger.posBox.AppendText($"{time} - Enemy: {enemy.Location} {Environment.NewLine}            " +
                 $"Player: {p.Location} {Environment.NewLine}");
+            #endregion
 
+            //Calculate the range of values that dec can take based on the sweepProbability,
+            //bigger sweepProbability means less range
             int maxRand = sweepProbability != 0 ? (int)(1/sweepProbability) : 400;
+
             //Random decision
             int dec = RandomNumberGenerator.Create().GetHashCode() % (maxRand + 1);
 
             //Condition to begin sweep
             if (dec == maxRand && !startSweep && sweepProbability != 0) startSweep = true;
+
             #region Sweep Movement 
             if (startSweep) {
                 //Determine ONCE if enemy is moreLeft
@@ -244,32 +263,33 @@ namespace Space_Game
                 else if (s == 2)
                 {
                     wait = waitTickAmt;
-                    //this is passed to enemyMove_Sweep() and it will know that state 2 is a-go
+                    //the sweep bool is passed to enemyMove_Sweep() and it will know that state 2 is a-go
                     if (!sweep) sweep = true; 
                 }
 
-                else if (s == 3) //reset
+                //end the sweep movement and reset variables
+                else if (s == 3) 
                 {
                     wait = 0;
                     startSweep = false;
                     sweep = false;
                     begin = false;
                 }
-                logger.moveBox.AppendText($"{getTime()} - Sweeping! (st={s}, w={wait}, sw={sweep}){Environment.NewLine}");
+                logger.moveBox.AppendText($"{time} - Sweeping! (st={s}, w={wait}, sw={sweep}){Environment.NewLine}");
             }
             #endregion
 
             #region Sporadic Movement
             if (dec > 0 && dec <= maxRand - 1 && !startSweep)
             {
-                logger.moveBox.AppendText($"{getTime()} - {dec} | ");
+                logger.moveBox.AppendText($"{time} - {dec} | ");
                 enemyMove_Sporadic();
                 if (dec % 5 == 0) SpawnBullet(enemy.Location);
             }
             #endregion
         }
         /// <summary>
-        /// Keeps time of seconds passed since Game start, end is responsible for ending the game once 
+        /// Keeps time of seconds passed since Game start and is responsible for ending the game once 
         /// the specificied amount of gameTime has passed
         /// </summary>
         private void GameTimer_Tick(object sender, EventArgs e)
@@ -305,10 +325,16 @@ namespace Space_Game
                 };
                 Hide();
             }
+            
+            //Update the timeLabel and increase the elapsedSeconds counter
             if (elapsedSeconds <= gameTime) timeLabel.Text = getTime();
             elapsedSeconds++;
 
         }
+        /// <summary>
+        /// Called at the very start of the game, it's responsible for initiating the
+        /// 3,2,1 FIGHT! countdown
+        /// </summary>
         private void OnOpenTimer_Tick(object sender, EventArgs e) 
         {
             //Begin timers and initiate countdown to begin the match
@@ -318,45 +344,53 @@ namespace Space_Game
                 gameTimer.Start();
                 enemyMovementTimer.Start();
                 starAnimateTimer.Start();
-                hasBegun = true;
+                gameHasBegun = true;
             }
             doCountdown("FIGHT!",3); 
         }
+        /// <summary>
+        /// 
+        /// </summary>
         private void BulletTimer_Tick(object sender, EventArgs e)
         {
-
+            string time = getTime();
             logger.label2.Text = $"Existing bullets: {bullets.Count}";
+
             foreach (var bullet in bullets.ToList())
             {
+                //Determine whether to move the bullet UP or DOWN based on who spawns it
                 if (bullet.Item1 == p) { FireBullet(bullet.Item2, 1);}
                 if (bullet.Item1 == enemy) { FireBullet(bullet.Item2, -1);}
 
                 //Despawn bullet if it goes off screen
                 //condition = top of window OR bottom of window
-                if (bullet.Item2.Location.Y <= -bullet.Item2.Height || bullet.Item2.Location.Y >= Height) clearBullet(bullet);
+                if (bullet.Item2.Location.Y <= -bullet.Item2.Height 
+                    || bullet.Item2.Location.Y >= Height) clearBullet(bullet);
                 
-                //Despawn bullet if it hits enemy
+                //Despawn bullet if it hits ENEMY
                 #region Enemy Location Conditions
                 bool e_xLeftBound = bullet.Item2.Location.X > enemy.Location.X;
                 bool e_xRightBound = bullet.Item2.Location.X < enemy.Location.X + enemy.Width + bullet.Item2.Width;
                 #endregion
-                if ((e_xLeftBound && e_xRightBound) && bullet.Item2.Location.Y <= enemy.Location.Y + enemy.Height)
+                if ((e_xLeftBound && e_xRightBound) 
+                    && bullet.Item2.Location.Y <= enemy.Location.Y + enemy.Height)
                 {
                     clearBullet(bullet);
                     score += 2;
                     scoreLabel.Text = score.ToString();
-                    logger.logBox.AppendText($"{getTime()} - Enemy Hit!"+Environment.NewLine);
+                    logger.logBox.AppendText($"{time} - Enemy Hit!"+Environment.NewLine);
                 }
 
-                //Despawn bullet if it hits player
+                //Despawn bullet if it hits PLAYER
                 #region Player Location Conditions
                 bool p_xLeftBound = bullet.Item2.Location.X > p.Location.X;
                 bool p_xRightBound = bullet.Item2.Location.X < p.Location.X + p.Width + bullet.Item2.Width;
                 #endregion
-                if ((p_xLeftBound && p_xRightBound) && bullet.Item2.Location.Y + bullet.Item2.Height >= p.Location.Y)
+                if ((p_xLeftBound && p_xRightBound) 
+                    && bullet.Item2.Location.Y + bullet.Item2.Height >= p.Location.Y)
                 {
                     clearBullet(bullet);
-                    logger.logBox.AppendText($"{getTime()} - Player hit!" + Environment.NewLine);
+                    logger.logBox.AppendText($"{time} - Player hit!" + Environment.NewLine);
                     score = score <= 0 ? 0 : score - 1;
                     scoreLabel.Text = score.ToString();
 
@@ -369,8 +403,11 @@ namespace Space_Game
         #region Player Controls
         private void Game_KeyDown(object sender, KeyEventArgs e)
         {
+            //if the SAME key is pressed again, then return and DO NOT execute the remaining 
+            //functions of the Game_KeyDown method
             if (kdk != Keys.None && kdk == e.KeyCode) return;
             kdk = e.KeyCode;
+
             bool gameRunning = enemyMovementTimer.Enabled && gameTimer.Enabled;
             if (gameRunning)
             {
@@ -398,7 +435,7 @@ namespace Space_Game
             {
                 SpawnBullet(p.Location);
             }
-            if (e.KeyCode == userControls.PauseGame && hasBegun)
+            if (e.KeyCode == userControls.PauseGame && gameHasBegun)
             {
                 if (gameRunning) 
                 {
@@ -414,6 +451,7 @@ namespace Space_Game
                     Controls.Remove(announceLabel);
                 };  
             }
+            //Unneccesarily complicated if statements where βαριεμαι να τα αλλαξω :)
             if (e.KeyCode == Keys.P)
             {
                 if (!logger.Visible) { logger.Show(); Cursor.Show(); }
@@ -426,6 +464,7 @@ namespace Space_Game
             PlayerMove();
             playerMovementTimer.Start();
         }
+
         private void Game_KeyUp(object sender, KeyEventArgs e)
         {
             kdk = Keys.None;
@@ -464,48 +503,54 @@ namespace Space_Game
 
         private int yReduction = 10; //reduce the y amount traversed each tick
 
-        void MoveUp(PictureBox p)
+        void MoveUp(PictureBox entity)
         {
-            if (p.Location.Y > Height / 2 - 100)
-            { p.Location = new Point(p.Location.X, p.Location.Y - (vehicleSpeed - yReduction)); }
+            if (entity.Location.Y > Height / 2 - 100)
+            { entity.Location = new Point(entity.Location.X, 
+                entity.Location.Y - (vehicleSpeed - yReduction)); }
         }
-        void MoveLeft(PictureBox p)
+        void MoveLeft(PictureBox entity)
         {
-            if (p.Location.X > 40)
-            { p.Location = new Point(p.Location.X - vehicleSpeed, p.Location.Y); }
+            if (entity.Location.X > 40)
+            { entity.Location = new Point(entity.Location.X - vehicleSpeed, 
+                entity.Location.Y); }
         }
-        void MoveDown(PictureBox p)
+        void MoveDown(PictureBox entity)
         {
-            if (p.Location.Y < Height - (vehicleSize.Height + vehicleSpeed + 20))
-            { p.Location = new Point(p.Location.X, p.Location.Y + (vehicleSpeed - yReduction)); }
+            if (entity.Location.Y < Height - (vehicleSize.Height + vehicleSpeed + 20))
+            { entity.Location = new Point(entity.Location.X, 
+                entity.Location.Y + (vehicleSpeed - yReduction)); }
         }
-        void MoveRight(PictureBox p)
+        void MoveRight(PictureBox entity)
         {
-            if (p.Location.X < Width - (vehicleSize.Width + vehicleSpeed + 40))
-            { p.Location = new Point(p.Location.X + vehicleSpeed, p.Location.Y); }
+            if (entity.Location.X < Width - (vehicleSize.Width + vehicleSpeed + 40))
+            { entity.Location = new Point(entity.Location.X + vehicleSpeed, 
+                entity.Location.Y); }
         }
 
-        //Overload left and right for enemy
-        void MoveLeft(PictureBox p, double moveScalar)
+        //Overload MoveLeft for enemy
+        void MoveLeft(PictureBox entity, double moveScalar)
         {
-            if (p.Location.X > 40)
+            if (entity.Location.X > 40)
             { 
-                p.Location = new Point(p.Location.X - (int)(vehicleSpeed * moveScalar), p.Location.Y);
+                entity.Location = new Point(entity.Location.X - (int)(vehicleSpeed * moveScalar), 
+                    entity.Location.Y);
                 //logger.logBox.AppendText($"Move Left ({-(int)(vehicleSpeed * moveScalar)}px)"+Environment.NewLine);
             }
         }
-
-        void MoveRight(PictureBox p, double moveScalar)
+        //Overload MoveRight for enemy
+        void MoveRight(PictureBox entity, double moveScalar)
         {
-            if (p.Location.X < Width - (vehicleSize.Width + vehicleSpeed + 40))
+            if (entity.Location.X < Width - (vehicleSize.Width + vehicleSpeed + 40))
             { 
-                p.Location = new Point(p.Location.X + (int)(vehicleSpeed * moveScalar), p.Location.Y);
+                entity.Location = new Point(entity.Location.X + (int)(vehicleSpeed * moveScalar), 
+                    entity.Location.Y);
                 //logger.logBox.AppendText($"Move Right ({(int)(vehicleSpeed * moveScalar)}px)"+Environment.NewLine);
             }
         }
 
         /// <summary>
-        /// Move the pictureBox according to movement bool values
+        /// Move the pictureBox assigned to the user according to movement bool values
         /// </summary>
         //This is where the movement actually occurs
         void PlayerMove()
@@ -592,13 +637,17 @@ namespace Space_Game
             //
             // -> In the Details folder of this project you can see the graphs of both a linear finalWeight function and
             //    a cubic one, along with some calculated values so you can clearly see the difference!
-            double finalWeight = 25 + 24 *(new MyMath().CubeRoot(directionWeight)); //takes values from 1 to 49 (both ends inclusive)
+
+            //takes values from 1 to 49 (both ends inclusive)
+            double finalWeight = 25 + 24 *(new MyMath().CubeRoot(directionWeight)); 
 
             //logger.logBox.AppendText($" | fW = {finalWeight}"+Environment.NewLine);
-            //for enemyDifficulty == 1, move around randomly
-            if (directionDecision >= 0 && directionDecision < finalWeight && enemyDifficulty == 1) MoveLeft(enemy, moveWeight);
-            //for enemyDifficulty == 2, follow player and continue moving sporadically while doing so.
-            if (directionDecision >= finalWeight && directionDecision <= 50 && enemyDifficulty == 1) MoveRight(enemy, 6 - moveWeight);
+            if (directionDecision >= 0 
+                && directionDecision < finalWeight 
+                && enemyDifficulty == 1) MoveLeft(enemy, moveWeight);
+            if (directionDecision >= finalWeight 
+                && directionDecision <= 50 
+                && enemyDifficulty == 1) MoveRight(enemy, 6 - moveWeight);
 
             //In both Move functions we use a weird looking moveScalar. 
             //It's very simple as it simply states in a mathematical fashion: Move slower as you get closer to the player!
@@ -625,12 +674,13 @@ namespace Space_Game
                 if (bullet.Item1 == p)
                 {
                     //bullet is to the right of the enemy
-
-                    bool bulletCloseToEnemyRight = (bullet.Item2.Location.X + bullet.Item2.Width/2) - (enemy.Location.X + enemy.Width/2) < 140 
+                    bool bulletCloseToEnemyRight = 
+                        (bullet.Item2.Location.X + bullet.Item2.Width/2) - (enemy.Location.X + enemy.Width/2) < 140 
                         && (bullet.Item2.Location.X + bullet.Item2.Width / 2) - (enemy.Location.X + enemy.Width / 2) >= 0
                         && Math.Abs(bullet.Item2.Location.Y - (enemy.Location.Y + enemy.Height)) < bulletSpeed * 3;
                     //bullet is to the left of the enemy
-                    bool bulletCloseToEnemyLeft = (bullet.Item2.Location.X + bullet.Item2.Width / 2) - (enemy.Location.X + enemy.Width / 2) > -140
+                    bool bulletCloseToEnemyLeft = 
+                        (bullet.Item2.Location.X + bullet.Item2.Width / 2) - (enemy.Location.X + enemy.Width / 2) > -140
                         && (bullet.Item2.Location.X + bullet.Item2.Width / 2) - (enemy.Location.X + enemy.Width / 2)  <= 0
                         && Math.Abs(bullet.Item2.Location.Y - (enemy.Location.Y + enemy.Height)) < bulletSpeed * 3;
 
@@ -649,7 +699,7 @@ namespace Space_Game
         /// - 2: Sweeping State: move across the window up till the other side
         /// - 3: Finished State: the sweeping movement has concluded
         /// </summary>
-        /// <param name="moreLeft">True - Sweep Right | False - Sweep Left</param>
+        /// <param name="moreLeft">true - Sweep Right | false - Sweep Left</param>
         /// <param name="sweep">Gets if sweeping state has started</param>
         /// <param name="wait">Gets how much more to wait when in waiting state</param>
         int enemyMove_Sweep(int wait,bool sweep, bool moreLeft)
@@ -691,6 +741,10 @@ namespace Space_Game
         #endregion
 
         #region Bullet Mechanics
+        /// <summary>
+        /// Creates the bullet control and places it according to the firing entity's location
+        /// </summary>
+        /// <param name="currentEntityLocation"></param>
         void SpawnBullet(Point currentEntityLocation)
         {
             Label bullet = new Label();
@@ -738,18 +792,6 @@ namespace Space_Game
             }
             else throw new Exception("Bullet is bi-directional, it takes direction = -1 or 1.");
         }
-
-        void FireBullet(Label bullet, int direction, double speedMultiplier)
-        {
-            if (direction == -1 || direction == 1)
-            {
-                bullet.Location = new Point(
-                    bullet.Location.X, 
-                    bullet.Location.Y - (int)(bulletSpeed * direction * speedMultiplier));
-            }
-            else throw new Exception("Bullet is bi-directional, it takes direction = -1 or 1.");
-        }
-
         /// <summary>
         /// Remove bullet from list and controls to avoid extra unnecessary memory usage
         /// </summary>
